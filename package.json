@@ -8,7 +8,7 @@
     "pack": "./node_modules/.bin/webpack --progress --profile --colors -w"
   },
   "dependencies": {
-    "best-candidate": "^1.0.1"
+    "best-candidate": "^1.0.2"
   },
   "devDependencies": {
     "eslint": "^4.5.0",

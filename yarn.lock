@@ -206,9 +206,9 @@ bcrypt-pbkdf@^1.0.0:
   dependencies:
     tweetnacl "^0.14.3"
 
-best-candidate@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/best-candidate/-/best-candidate-1.0.1.tgz#03778dde454b25f3cad6181d62815e6a9b39f3b5"
+best-candidate@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/best-candidate/-/best-candidate-1.0.2.tgz#3690677a90b3ac26090730ce176c8fe91b7dd052"
   dependencies:
     d3 "^4.10.0"
 
