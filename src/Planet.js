@@ -14,23 +14,34 @@ export class Planet {
   create(parent) {
     this.$link =
       select(parent)
-        .append('circle')
-        .on('mousemove', () => {
-          this.stop()
-        })
-        .on('mouseleave', () => {
-          this.run()
-        })
+        .append('g')
+
+    this.$link
+      .append('use')
+      .attr('xlink:href', '#planet')
+      .attr('width', 25)
+      .attr('height', 25)
+      .attr('x', 0)
+      .attr('y', 0)
+      .on('mousemove', () => {
+        this.stop()
+      })
+      .on('mouseleave', () => {
+        this.run()
+      })
   }
 
   update() {
     this.angle += this.speed
     let [x, y] = this.orbit.getPlanetPosition(angleToRadian(this.angle))
     this.$link
-      .attr('cx', x)
-      .attr('cy', y)
-      .attr('r', this.size)
       .attr('fill', this.color)
+      .attr('transform', `translate(${x}, ${y})`)
+      /* .attr('transform',
+        `translate(
+          ${x - 93.38 * this.size / 0.1 / 2},
+          ${y - 53.02 * this.size / 0.1 / 2})`
+      ) */
   }
 
   renderOrbit(...arg) {
@@ -40,7 +51,7 @@ export class Planet {
   run(place) {
     let run = () => {
       this.update()
-      this.animationFrame = requestAnimationFrame(run)
+      // this.animationFrame = requestAnimationFrame(run)
     }
     if (!this.$link) {
       this.create(place)
