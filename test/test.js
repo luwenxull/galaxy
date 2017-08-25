@@ -1,7 +1,7 @@
 import {randomUniform} from 'd3-random'
 import {select} from 'd3-selection'
 import Quadtree from 'best-candidate'
-import {Planet, Orbit, Star} from '../index'
+import {PlanetSymbol, Orbit, Star} from '../index'
 
 
 let randomColor = (function() {
@@ -50,21 +50,18 @@ let randomColor = (function() {
     return hslToRgb(h, 0.5, 0.60);
   };
 })()
-let pWidth = 93.38
-let pHeight = 53.02
-let scale = 0.1
 let radiusR = randomUniform(-10, 10)
-let sizeR = randomUniform(0.05, 0.15)
+let sizeR = randomUniform(20, 80)
 let positionR = randomUniform(0, 360)
 let speedR = randomUniform(1, 2)
 let stepR = randomUniform(0.01, 0.02)
-let n = 2
+let n = 5
 let all = []
 for (let i = 0; i < n; i++) {
   let orbit = new Orbit(80 * (i + 1) + radiusR())
   all.push(
-    new Planet(
-      orbit, 0.1, positionR(), speedR() / (i + 1), randomColor()
+    new PlanetSymbol(
+      orbit, positionR(), speedR() / (i + 1), randomColor(), sizeR(), '#planet'
     )
   )
 }
@@ -95,10 +92,10 @@ let stars =
 
 
 for (let star of stars) {
-  // star.twinkle('#stars', 'gray', '#66bb6a', stepR())
+  star.twinkle('#stars', 'gray', '#66bb6a', stepR())
 }
 
 all.forEach(planet => {
-  planet.renderOrbit('#orbits')
+  // planet.renderOrbit('#orbits')
   planet.run('#planets')
 })
