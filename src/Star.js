@@ -24,24 +24,24 @@ export class Star {
 
   processTwinkle() {
     switch (this.twinkleController.progress) {
-    case 0: {
-      this.twinkleController.current += this.twinkleController.step
-      if (this.twinkleController.current > 1) {
-        this.twinkleController.current = 1
-        this.twinkleController.progress = 1
+      case 0: {
+        this.twinkleController.current += this.twinkleController.step
+        if (this.twinkleController.current > 1) {
+          this.twinkleController.current = 1
+          this.twinkleController.progress = 1
+        }
+        break
       }
-      break
-    }
-    case 1: {
-      this.twinkleController.current -= this.twinkleController.step
-      if (this.twinkleController.current < 0) {
-        this.twinkleController.current = 0
-        this.twinkleController.progress = 0
+      case 1: {
+        this.twinkleController.current -= this.twinkleController.step
+        if (this.twinkleController.current < 0) {
+          this.twinkleController.current = 0
+          this.twinkleController.progress = 0
+        }
+        break
       }
-      break
-    }
-    default:
-      break
+      default:
+        break
     }
   }
 
@@ -61,9 +61,12 @@ export class Star {
     if (this.twinkleController.step) {
       let twinkle = () => {
         this.processTwinkle()
-        this.$link.attr(
-          'fill',
-          this.colorInterpolator(this.twinkleController.current))
+        this.$link
+          .attr(
+            'fill',
+            this.colorInterpolator(this.twinkleController.current)
+          )
+          .attr('r', this.radius * this.twinkleController.current)
         requestAnimationFrame(twinkle)
       }
       requestAnimationFrame(twinkle)

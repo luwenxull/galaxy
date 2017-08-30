@@ -4,11 +4,11 @@ import Quadtree from 'best-candidate'
 import {PlanetSymbol, Orbit, Star} from '../index'
 
 
-let randomColor = (function() {
+let randomColor = (function () {
   let goldenRatioConjugate = 0.618033988749895;
   let h = Math.random();
 
-  let hslToRgb = function(h, s, l) {
+  let hslToRgb = function (h, s, l) {
     let r
     let g
     let b
@@ -18,7 +18,7 @@ let randomColor = (function() {
       g = l;
       b = l;
     } else {
-      let hue2rgb = function(p, q, t) {
+      let hue2rgb = function (p, q, t) {
         if (t < 0) t += 1;
         if (t > 1) t -= 1;
         if (t < 1 / 6) {
@@ -44,7 +44,7 @@ let randomColor = (function() {
       + Math.round(g * 255).toString(16) + Math.round(b * 255).toString(16);
   };
 
-  return function() {
+  return function () {
     h += goldenRatioConjugate;
     h %= 1;
     return hslToRgb(h, 0.5, 0.60);
@@ -66,19 +66,19 @@ for (let i = 0; i < n; i++) {
   )
 }
 
-let width = 1000;
-let height = 800
-let quadtree = new Quadtree(width, height, 10)
-quadtree.add(50, 10)
+let {width, height} = document.querySelector('#stage').getBoundingClientRect()
+let l = Math.sqrt(width * width + height * height)
+let quadtree = new Quadtree(l, l, 10)
+quadtree.add(200, 10)
 select('#stars')
-  .attr('width', width)
-  .attr('height', height)
-  .style('position', 'absolute')
+  .attr('width', l)
+  .attr('height', l)
+  // .attr('transform', `translate(-${width / 2}, -${height / 2})`)
+  // .style('transform-origin',)
 
 select('#galaxy')
   .attr('width', width)
   .attr('height', height)
-  .style('position', 'relative')
   .append('g')
   .attr('transform', `translate(${width / 2},${height / 2})`)
   .selectAll('g')
