@@ -4,11 +4,11 @@ import Quadtree from 'best-candidate'
 import {PlanetSymbol, Orbit, Star} from '../index'
 
 
-let randomColor = (function () {
+let randomColor = (function() {
   let goldenRatioConjugate = 0.618033988749895;
   let h = Math.random();
 
-  let hslToRgb = function (h, s, l) {
+  let hslToRgb = function(h, s, l) {
     let r
     let g
     let b
@@ -18,7 +18,7 @@ let randomColor = (function () {
       g = l;
       b = l;
     } else {
-      let hue2rgb = function (p, q, t) {
+      let hue2rgb = function(p, q, t) {
         if (t < 0) t += 1;
         if (t > 1) t -= 1;
         if (t < 1 / 6) {
@@ -44,7 +44,7 @@ let randomColor = (function () {
       + Math.round(g * 255).toString(16) + Math.round(b * 255).toString(16);
   };
 
-  return function () {
+  return function() {
     h += goldenRatioConjugate;
     h %= 1;
     return hslToRgb(h, 0.5, 0.60);
@@ -53,7 +53,7 @@ let randomColor = (function () {
 let radiusR = randomUniform(-10, 10)
 let sizeR = randomUniform(20, 80)
 let positionR = randomUniform(0, 360)
-let speedR = randomUniform(1, 2)
+let speedR = randomUniform(0.1, 0.2)
 let stepR = randomUniform(0.01, 0.02)
 let n = 5
 let all = []
@@ -67,14 +67,21 @@ for (let i = 0; i < n; i++) {
 }
 
 let {width, height} = document.querySelector('#stage').getBoundingClientRect()
-let l = Math.sqrt(width * width + height * height)
-let quadtree = new Quadtree(l, l, 10)
+let r = Math.sqrt(width * width + height * height)
+let offsetX = width - r
+let offsetY = height - r
+let quadtree = new Quadtree(r, r, 10)
+
 quadtree.add(200, 10)
 select('#stars')
-  .attr('width', l)
-  .attr('height', l)
-  // .attr('transform', `translate(-${width / 2}, -${height / 2})`)
-  // .style('transform-origin',)
+  .attr('width', width)
+  .attr('height', height)
+  .append('g')
+  .attr('id', 'stars-group')
+  .attr('transform', `translate(${offsetX / 2}, ${offsetY / 2})`)
+  .append('g')
+  .attr('id', 'stars-rotate-group')
+  .style('transform-origin', '50% 50%')
 
 select('#galaxy')
   .attr('width', width)
@@ -92,7 +99,7 @@ let stars =
 
 
 for (let star of stars) {
-  star.twinkle('#stars', 'gray', '#66bb6a', stepR())
+  star.twinkle('#stars-rotate-group', 'gray', '#66bb6a', stepR())
 }
 
 all.forEach(planet => {

@@ -24,24 +24,24 @@ export class Star {
 
   processTwinkle() {
     switch (this.twinkleController.progress) {
-      case 0: {
-        this.twinkleController.current += this.twinkleController.step
-        if (this.twinkleController.current > 1) {
-          this.twinkleController.current = 1
-          this.twinkleController.progress = 1
-        }
-        break
+    case 0: {
+      this.twinkleController.current += this.twinkleController.step
+      if (this.twinkleController.current > 1) {
+        this.twinkleController.current = 1
+        this.twinkleController.progress = 1
       }
-      case 1: {
-        this.twinkleController.current -= this.twinkleController.step
-        if (this.twinkleController.current < 0) {
-          this.twinkleController.current = 0
-          this.twinkleController.progress = 0
-        }
-        break
+      break
+    }
+    case 1: {
+      this.twinkleController.current -= this.twinkleController.step
+      if (this.twinkleController.current < 0) {
+        this.twinkleController.current = 0
+        this.twinkleController.progress = 0
       }
-      default:
-        break
+      break
+    }
+    default:
+      break
     }
   }
 
