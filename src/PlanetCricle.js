@@ -2,14 +2,14 @@ import {select} from 'd3-selection'
 import {angleToRadian} from './tool'
 import {Planet} from './Planet'
 
-export class PlanetCircle {
-  constructor(orbit, scale, angle, speed, color) {
+export class PlanetCircle extends Planet {
+  constructor({orbit, angle, speed, color, size}) {
+    super()
     this.orbit = orbit
-    this.scale = scale
-    this.size = scale / initialSize.scale * initialSize.size
     this.angle = angle
     this.speed = speed
     this.color = color
+    this.size = size
     this.animationFrame = null
     this.$link = null
   }
@@ -21,8 +21,8 @@ export class PlanetCircle {
 
     this.$link
       .append('circle')
-      .attr('cx', 0)
-      .attr('cy', 0)
+      .attr('fill', this.color)
+      .attr('r', this.size)
       .on('mousemove', () => {
         this.stop()
       })
@@ -35,13 +35,9 @@ export class PlanetCircle {
     this.angle += this.speed
     let [x, y] = this.orbit.getPlanetPosition(angleToRadian(this.angle))
     this.$link
-      .attr('fill', this.color)
-      .attr('transform', `translate(${x - }, ${y})`)
-      /* .attr('transform',
-        `translate(
-          ${x - 93.38 * this.size / 0.1 / 2},
-          ${y - 53.02 * this.size / 0.1 / 2})`
-      ) */
+      .select('circle')
+      .attr('cx', x)
+      .attr('cy', y)
   }
 
   renderOrbit(...arg) {

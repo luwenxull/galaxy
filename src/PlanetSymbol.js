@@ -3,7 +3,7 @@ import {angleToRadian} from './tool'
 import {Planet} from './Planet'
 
 export class PlanetSymbol extends Planet {
-  constructor(orbit, angle, speed, color, size, useID) {
+  constructor({orbit, angle, speed, color, size, useID}) {
     super()
     this.orbit = orbit
     this.angle = angle

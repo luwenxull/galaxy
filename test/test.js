@@ -1,7 +1,7 @@
 import {randomUniform} from 'd3-random'
 import {select} from 'd3-selection'
 import Quadtree from 'best-candidate'
-import {PlanetSymbol, Orbit, Star} from '../index'
+import {PlanetSymbol, PlanetCircle, Orbit, Star} from '../index'
 
 
 let randomColor = (function() {
@@ -60,10 +60,24 @@ let all = []
 for (let i = 0; i < n; i++) {
   let orbit = new Orbit(80 * (i + 1) + radiusR())
   all.push(
-    new PlanetSymbol(
-      orbit, positionR(), speedR() / (i + 1), randomColor(), sizeR(), '#planet'
-    )
+    new PlanetSymbol({
+      orbit,
+      angle: positionR(),
+      speed: speedR() / (i + 1),
+      color: randomColor(),
+      size: sizeR(),
+      useID: '#planet',
+    })
   )
+  /* all.push(
+    new PlanetCircle({
+      orbit,
+      angle: positionR(),
+      speed: speedR() / (i + 1),
+      color: randomColor(),
+      size: sizeR(),
+    })
+  ) */
 }
 
 let {width, height} = document.querySelector('#stage').getBoundingClientRect()

@@ -1,5 +1,4 @@
 import {select} from 'd3-selection'
-import {color} from 'd3-color'
 import {interpolateRgb} from 'd3-interpolate'
 export class Star {
   constructor(center, radius) {
