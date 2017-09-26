@@ -10,7 +10,7 @@
     "start": "./node_modules/.bin/webpack-dev-server --open"
   },
   "dependencies": {
-    "best-candidate": "^1.0.2"
+    "best-candidate": "^1.0.3"
   },
   "devDependencies": {
     "clean-webpack-plugin": "^0.1.16",

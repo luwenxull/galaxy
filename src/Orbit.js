@@ -3,7 +3,7 @@ export default class Orbit {
   constructor(radius, center = [0, 0]) {
     this.center = center
     this.radius = radius
-    this.$link = null
+    this.$group = null
 
   }
 
@@ -14,7 +14,7 @@ export default class Orbit {
   }
 
   render(place) {
-    this.$link = select(place)
+    this.$group = select(place)
       .append('circle')
       .attr('fill', 'none')
       .attr('stroke', '#ddd')

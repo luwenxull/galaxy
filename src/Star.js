@@ -9,11 +9,11 @@ export default class Star {
       current: 0,
       step: 0,
     }
-    this.$link = null
+    this.$group = null
   }
 
   create(place) {
-    this.$link = select(place)
+    this.$group = select(place)
       .append('circle')
       .attr('cx', this.center[0])
       .attr('cy', this.center[1])
@@ -54,13 +54,13 @@ export default class Star {
 
   twinkle(place, start, stop, step = 0.005) {
     this.configColor(start, stop, step)
-    if (!this.$link) {
+    if (!this.$group) {
       this.create(place)
     }
     if (this.twinkleController.step) {
       let twinkle = () => {
         this.processTwinkle()
-        this.$link
+        this.$group
           .attr(
             'fill',
             this.colorInterpolator(this.twinkleController.current)

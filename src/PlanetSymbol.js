@@ -13,15 +13,15 @@ export default class PlanetSymbol extends Planet {
     this.size = size
     this.positionRevise = null
     this.animationFrame = null
-    this.$link = null
+    this.$group = null
   }
 
   create(parent) {
-    this.$link =
+    this.$group =
       select(parent)
         .append('g')
 
-    let use = this.$link
+    let use = this.$group
       .append('use')
       .attr('xlink:href', this.useID)
 
@@ -44,7 +44,7 @@ export default class PlanetSymbol extends Planet {
   update() {
     this.angle += this.speed
     let [x, y] = this.orbit.getPlanetPosition(angleToRadian(this.angle))
-    this.$link
+    this.$group
       .attr('fill', this.color)
       .attr('transform',
         `translate(

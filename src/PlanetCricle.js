@@ -11,15 +11,15 @@ export default class PlanetCircle extends Planet {
     this.color = color
     this.size = size
     this.animationFrame = null
-    this.$link = null
+    this.$group = null
   }
 
   create(parent) {
-    this.$link =
+    this.$group =
       select(parent)
         .append('g')
 
-    this.$link
+    this.$group
       .append('circle')
       .attr('fill', this.color)
       .attr('r', this.size)
@@ -34,7 +34,7 @@ export default class PlanetCircle extends Planet {
   update() {
     this.angle += this.speed
     let [x, y] = this.orbit.getPlanetPosition(angleToRadian(this.angle))
-    this.$link
+    this.$group
       .select('circle')
       .attr('cx', x)
       .attr('cy', y)
@@ -49,7 +49,7 @@ export default class PlanetCircle extends Planet {
       this.update()
       this.animationFrame = requestAnimationFrame(run)
     }
-    if (!this.$link) {
+    if (!this.$group) {
       this.create(place)
     }
     this.animationFrame = requestAnimationFrame(run)

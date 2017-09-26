@@ -15,7 +15,7 @@ export default class Planet {
   }
 
   run(place) {
-    if (!this.$link) {
+    if (!this.$group) {
       this.create(place)
     }
     let run = () => {
