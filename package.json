@@ -5,14 +5,19 @@
   "author": "luwenxull <992273307@qq.com>",
   "license": "MIT",
   "scripts": {
-    "pack": "./node_modules/.bin/webpack --progress --profile --colors -w"
+    "build": "./node_modules/.bin/webpack --progress --profile --colors",
+    "watch": "./node_modules/.bin/webpack --progress --profile --colors -w",
+    "start": "./node_modules/.bin/webpack-dev-server --open"
   },
   "dependencies": {
     "best-candidate": "^1.0.2"
   },
   "devDependencies": {
+    "clean-webpack-plugin": "^0.1.16",
     "eslint": "^4.5.0",
     "eslint-config-google": "^0.9.1",
-    "webpack": "^3.5.5"
+    "html-webpack-plugin": "^2.30.1",
+    "webpack": "^3.5.5",
+    "webpack-dev-server": "^2.8.2"
   }
 }

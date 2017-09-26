@@ -1,6 +1,6 @@
-import {select} from 'd3-selection'
-import {interpolateRgb} from 'd3-interpolate'
-export class Star {
+import { select } from 'd3-selection'
+import { interpolateRgb } from 'd3-interpolate'
+export default class Star {
   constructor(center, radius) {
     this.center = center
     this.radius = radius

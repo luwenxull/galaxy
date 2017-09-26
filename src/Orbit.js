@@ -1,9 +1,10 @@
-import {select} from 'd3-selection'
-export class Orbit {
+import { select } from 'd3-selection'
+export default class Orbit {
   constructor(radius, center = [0, 0]) {
     this.center = center
     this.radius = radius
     this.$link = null
+
   }
 
   getPlanetPosition(radian) {

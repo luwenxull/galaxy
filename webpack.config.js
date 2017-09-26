@@ -1,20 +1,29 @@
-let path = require('path');
-let webpack = require('webpack');
+const path = require('path');
+const webpack = require('webpack')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = function(env) {
   return {
     entry: {
       index: './test/test.js',
     },
-    devtool: 'inline-source-map',
     output: {
-      path: path.join(__dirname, './test'),
+      path: path.join(__dirname, 'dist'),
       filename: '[name].js',
     },
     plugins: [
-      new webpack.optimize.CommonsChunkPlugin({
-        name: ['manifest'],
+      new CleanWebpackPlugin(['dist']),
+      new HtmlWebpackPlugin({
+        title: 'galaxy',
+        template: 'template/index.ejs',
       }),
+      new webpack.HotModuleReplacementPlugin(),
     ],
+    devtool: 'inline-source-map',
+    devServer: {
+      contentBase: './dist',
+      hot: true,
+    },
     module: {
       rules: [],
     },

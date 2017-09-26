@@ -1,9 +1,9 @@
-import {select} from 'd3-selection'
-import {angleToRadian} from './tool'
-import {Planet} from './Planet'
+import { select } from 'd3-selection'
+import { angleToRadian } from './tool'
+import Planet from './Planet'
 
-export class PlanetSymbol extends Planet {
-  constructor({orbit, angle, speed, color, size, useID}) {
+export default class PlanetSymbol extends Planet {
+  constructor({ orbit, angle, speed, color, size, useID }) {
     super()
     this.orbit = orbit
     this.angle = angle
@@ -37,7 +37,7 @@ export class PlanetSymbol extends Planet {
         this.run()
       })
 
-    let {width, height} = use.node().getBoundingClientRect()
+    let { width, height } = use.node().getBoundingClientRect()
     this.positionRevise = [width / 2, height / 2]
   }
 

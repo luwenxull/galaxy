@@ -1,4 +1,4 @@
-export class Planet {
+export default class Planet {
   constructor() {
     if (new.target.name === 'Planet') {
       throw Error('Do not call new Planet() directly!')

@@ -1,7 +1,9 @@
-import {randomUniform} from 'd3-random'
-import {select} from 'd3-selection'
+import { randomUniform } from 'd3-random'
+import { select } from 'd3-selection'
 import Quadtree from 'best-candidate'
-import {PlanetSymbol, PlanetCircle, Orbit, Star} from '../index'
+import Orbit from '../src/Orbit'
+import Star from '../src/Star'
+import PlanetSymbol from '../src/PlanetSymbol'
 
 
 let randomColor = (function() {
@@ -80,13 +82,13 @@ for (let i = 0; i < n; i++) {
   ) */
 }
 
-let {width, height} = document.querySelector('#stage').getBoundingClientRect()
+let { width, height } = document.querySelector('#stage').getBoundingClientRect()
 let r = Math.sqrt(width * width + height * height)
 let offsetX = width - r
 let offsetY = height - r
 let quadtree = new Quadtree(r, r, 10)
 
-quadtree.add(200, 10)
+quadtree.add(200, 1)
 select('#stars')
   .attr('width', width)
   .attr('height', height)
@@ -120,3 +122,9 @@ all.forEach(planet => {
   // planet.renderOrbit('#orbits')
   planet.run('#planets')
 })
+
+if (module.hot) {
+  module.hot.accept('../src/Orbit', function() {
+    console.log('Accepting the updated Orbit');
+  })
+}

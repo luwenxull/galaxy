@@ -1,9 +1,9 @@
-import {select} from 'd3-selection'
-import {angleToRadian} from './tool'
-import {Planet} from './Planet'
+import { select } from 'd3-selection'
+import { angleToRadian } from './tool'
+import Planet from './Planet'
 
-export class PlanetCircle extends Planet {
-  constructor({orbit, angle, speed, color, size}) {
+export default class PlanetCircle extends Planet {
+  constructor({ orbit, angle, speed, color, size }) {
     super()
     this.orbit = orbit
     this.angle = angle
