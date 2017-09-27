@@ -10,52 +10,37 @@ export default class PlanetCircle extends Planet {
     this.speed = speed
     this.color = color
     this.size = size
-    this.animationFrame = null
     this.$group = null
   }
 
   create(parent) {
-    this.$group =
-      select(parent)
-        .append('g')
+    this.$group = parent.append('g').attr('data-name', 'planet-group')
 
     this.$group
       .append('circle')
       .attr('fill', this.color)
       .attr('r', this.size)
       .on('mousemove', () => {
-        this.stop()
+        // this.stop()
       })
       .on('mouseleave', () => {
-        this.run()
+        // this.run()
       })
   }
 
-  update() {
-    this.angle += this.speed
-    let [x, y] = this.orbit.getPlanetPosition(angleToRadian(this.angle))
+  update(angle, x, y) {
+    this.setAngle(angle)
     this.$group
       .select('circle')
       .attr('cx', x)
       .attr('cy', y)
   }
 
-  renderOrbit(...arg) {
-    this.orbit.render(...arg)
+  getAngle() {
+    return this.angle
   }
 
-  run(place) {
-    let run = () => {
-      this.update()
-      this.animationFrame = requestAnimationFrame(run)
-    }
-    if (!this.$group) {
-      this.create(place)
-    }
-    this.animationFrame = requestAnimationFrame(run)
-  }
-
-  stop() {
-    cancelAnimationFrame(this.animationFrame)
+  setAngle(angle) {
+    this.angle = angle
   }
 }

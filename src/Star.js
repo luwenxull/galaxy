@@ -12,13 +12,14 @@ export default class Star {
     this.$group = null
   }
 
-  create(place) {
+  create(place, filterID) {
     this.$group = select(place)
       .append('circle')
       .attr('cx', this.center[0])
       .attr('cy', this.center[1])
       .attr('r', this.radius)
       .attr('fill', this.colorInitial)
+    filterID && this.$group.attr('filter', `url(#${filterID})`)
   }
 
   processTwinkle() {
@@ -52,10 +53,10 @@ export default class Star {
     this.twinkleController.step = step
   }
 
-  twinkle(place, start, stop, step = 0.005) {
+  twinkle(place, start, stop, step = 0.005, filterID = '') {
     this.configColor(start, stop, step)
     if (!this.$group) {
-      this.create(place)
+      this.create(place, filterID)
     }
     if (this.twinkleController.step) {
       let twinkle = () => {

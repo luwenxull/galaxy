@@ -1,13 +1,16 @@
 import Quadtree from 'best-candidate'
 import { select } from 'd3-selection'
 import { randomUniform } from 'd3-random'
-const randomStep = randomUniform(0.01, 0.02)
+import { gaussianBlur } from './Filter'
 import Star from './Star'
+const randomStep = randomUniform(0.01, 0.02)
 class Galaxy {
   constructor() {
     this.$stars = {
-      dom: null,
-      group: null,
+      container: null,
+      svg: null,
+      rootGroup: null,
+      filter: null,
       data: null,
       style: {
         position: 'absolute',
@@ -18,22 +21,26 @@ class Galaxy {
         overflow: 'hidden',
       },
     }
-    this.$planets = {
-      dom: null,
+    this.$orbits = {
+      container: null,
+      group: null,
       data: null,
+      style: {
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden',
+      },
     }
   }
 
-  render(container, data) {
+  render(container, orbits) {
     container.textContent = ''
-    this.initContainer(container)
-  }
-
-  initContainer(container) {
+    this.$orbits.data = orbits
     let { width, height } = container.getBoundingClientRect()
     this.initStarsContainer(container, width, height)
-    // this.initPlanetsContainer(container, width, height)
+    this.initOrbitsContainer(container, width, height)
     this.drawStars(width, height, 200)
+    this.drawOrbits()
   }
 
   update() {
@@ -41,7 +48,7 @@ class Galaxy {
   }
 
   initStarsContainer(container, width, height) {
-    this.$stars.dom = select(container)
+    this.$stars.container = select(container)
       .append('div')
       .classed('galaxy-starts', true)
       .call(selection => {
@@ -49,28 +56,45 @@ class Galaxy {
           selection.style(key, this.$stars.style[key])
         }
       })
-    this.$stars.group =
-      this.$stars.dom
-        .append('svg').attr('width', '100%').attr('height', '100%').append('g')
+    this.$stars.svg = this.$stars.container
+      .append('svg').attr('width', '100%').attr('height', '100%')
+
+    this.$stars.filter = this.$stars.svg.append('defs').append('filter').attr('id', 'gaussian-blur')
+    this.$stars.rootGroup = this.$stars.svg.append('g')
+    gaussianBlur(this.$stars.filter, void 0, 'blur', 1)
   }
 
-  initPlanetsContainer(container, width, height) {
-    this.$planets.dom = select(container)
+  initOrbitsContainer(container, width, height) {
+    this.$orbits.container = select(container)
       .append('div')
       .classed('galaxy-planets', true)
-    this.$planets.dom.append('svg').attr('width', width).attr('height', height)
+      .call(selection => {
+        for (let key of Object.keys(this.$orbits.style)) {
+          selection.style(key, this.$orbits.style[key])
+        }
+      })
+    this.$orbits.svg = this.$orbits.container.append('svg').attr('width', '100%').attr('height', '100%')
+    this.$orbits.rootGroup =
+      this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
   }
 
   drawStars(width, height, count) {
     let r = Math.sqrt(width * width + height * height)
     let offsetX = width - r
     let offsetY = height - r
-    this.$stars.group.attr('transform', `translate(${offsetX / 2}, ${offsetY / 2})`)
+    this.$stars.rootGroup.attr('transform', `translate(${offsetX / 2}, ${offsetY / 2})`)
     let quadtree = new Quadtree(r, r, 10)
     quadtree.add(200, 1)
-    let stars = quadtree.getCandidates().map(candidate => new Star(candidate, 5))
+    let stars = quadtree.getCandidates().map(candidate => new Star(candidate, 3))
     for (let star of stars) {
-      star.twinkle(this.$stars.group.node(), 'gray', 'red', randomStep())
+      star.twinkle(this.$stars.rootGroup.node(), 'gray', '#03A9F4', randomStep())
+    }
+  }
+
+  drawOrbits() {
+    for (let orbit of this.$orbits.data) {
+      orbit.reset()
+      orbit.run(this.$orbits.rootGroup, false)
     }
   }
 }
