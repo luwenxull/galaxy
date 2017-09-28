@@ -3,11 +3,9 @@ import { angleToRadian } from './tool'
 import Planet from './Planet'
 
 export default class PlanetCircle extends Planet {
-  constructor({ orbit, angle, speed, color, size }) {
+  constructor({ angle, color, size }) {
     super()
-    this.orbit = orbit
     this.angle = angle
-    this.speed = speed
     this.color = color
     this.size = size
     this.$group = null

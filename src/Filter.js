@@ -4,6 +4,7 @@ export function gaussianBlur(filter, input = 'SourceGraphic', output, deviation 
     .attr('in', input)
     .attr('result', output)
     .attr('stdDeviation', deviation)
+  return filter
 }
 
 export function colorMatrix(filter, input = 'SourceGraphic', output, values) {
@@ -13,6 +14,7 @@ export function colorMatrix(filter, input = 'SourceGraphic', output, values) {
     .attr('result', output)
     .attr('type', 'matrix')
     .attr('values', values)
+  return filter
 }
 
 export function offset(filter, input = 'SourceGraphic', output, dx = 0, dy = 0) {
@@ -22,6 +24,7 @@ export function offset(filter, input = 'SourceGraphic', output, dx = 0, dy = 0) 
     .attr('result', output)
     .attr('dx', dx)
     .attr('dy', dy)
+  return filter
 }
 
 export function merge(filter, merges) {
@@ -32,4 +35,5 @@ export function merge(filter, merges) {
     .enter()
     .append('feMergeNode')
     .attr('in', datum => datum)
+  return filter
 }

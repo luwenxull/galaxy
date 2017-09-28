@@ -1,8 +1,8 @@
 import { angleToRadian } from './tool'
 export default class Orbit {
-  constructor(radius, speed, center = [0, 0]) {
+  constructor(speed, center = [0, 0]) {
+    this.radius = null
     this.center = center
-    this.radius = radius
     this.speed = speed
     this.planets = []
     this.animationFrame = null
@@ -34,8 +34,12 @@ export default class Orbit {
     this.animationFrame = requestAnimationFrame(run)
   }
 
-  renderSelf(parent) {
-    this.$group = parent.append('g')
+  renderSelf() {
+    this.$group.append('circle')
+      .attr('r', this.radius)
+      .attr('fill', 'none')
+      .attr('stroke', 'blue')
+      .attr('stroke-width', 1)
   }
 
   init(parent) {
@@ -56,6 +60,11 @@ export default class Orbit {
 
   reset() {
     this._needInit = true
+    this.$group = null
     this.animationFrame !== null && cancelAnimationFrame(this.animationFrame)
+  }
+
+  setRadius(radius) {
+    this.radius = radius
   }
 }
