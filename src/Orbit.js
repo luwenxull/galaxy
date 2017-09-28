@@ -12,6 +12,7 @@ export default class Orbit {
     this.animationFrame = null
     this.$group = null
     this._needInit = true
+    this.angle = 0
   }
 
   getPlanetPosition(radian) {
@@ -52,6 +53,8 @@ export default class Orbit {
   renderPlanets(planetFilter, requestGradient) {
     for (let planet of this.planets) {
       planet.create(this.$group, planetFilter, requestGradient)
+      let angle = planet.getAngle()
+      planet.update(angle, ...this.getPlanetPosition(angleToRadian(angle)))
     }
   }
 
@@ -61,11 +64,13 @@ export default class Orbit {
   }
 
   update() {
-    for (let planet of this.planets) {
+    /* for (let planet of this.planets) {
       let angle = planet.getAngle() + this.speed
       let [x, y] = this.getPlanetPosition(angleToRadian(angle))
       planet.update(angle, x, y)
-    }
+    } */
+    this.angle += 0.1
+    this.$group.style('transform', `rotate(${this.angle}deg)`)
   }
 
   reset() {
