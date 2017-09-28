@@ -13,20 +13,31 @@ for (let i = 0; i < orbitNum; i++) {
   let orbit = new Orbit(speedR())
   orbit.addPlanet(
     new PlanetCircle({
-      angle: positionR(),
       color: 'red',
+      gradient: 'red',
       size: sizeR(),
     })
   )
   orbits.push(orbit)
 }
-
+function newPlanet() {
+  let randomIndex = Math.floor(randomUniform(0, orbits.length)())
+  let orbit = orbits[randomIndex]
+  orbit.addPlanet(
+    new PlanetCircle({
+      color: 'orange',
+      gradient: 'orange',
+      size: sizeR(),
+    })
+  )
+}
 function newOrbit() {
   let orbit = new Orbit(speedR())
   orbit.addPlanet(
     new PlanetCircle({
       angle: positionR(),
       color: 'yellow',
+      gradient: 'yellow',
       size: sizeR(),
     })
   )
@@ -36,6 +47,9 @@ function newOrbit() {
 let container = document.getElementById('container')
 function doRender() {
   galaxy.render(container, orbits)
+}
+function doUpdate() {
+  galaxy.update(orbits)
 }
 doRender()
 if (module.hot) {
@@ -48,7 +62,12 @@ if (module.hot) {
 }
 
 window._render = doRender
+window._update = doUpdate
 window._renderWithNewOrbit = function() {
   newOrbit()
-  doRender()
+  doUpdate()
+}
+window._renderWithNewPlanet = function() {
+  newPlanet()
+  doUpdate()
 }

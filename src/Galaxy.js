@@ -2,6 +2,7 @@ import Quadtree from 'best-candidate'
 import { select } from 'd3-selection'
 import { randomUniform } from 'd3-random'
 import { gaussianBlur } from './Filter'
+import { stereoscopicStop } from './Gradient'
 import Star from './Star'
 import { dynamicDistributeOrbit } from './tool'
 const randomStep = randomUniform(0.01, 0.02)
@@ -13,6 +14,7 @@ const defaultProp = {
   filters: null,
   data: null,
 }
+const gradientMap = new Map()
 class Galaxy {
   constructor() {
     this.$stars = Object.assign({
@@ -32,32 +34,31 @@ class Galaxy {
         overflow: 'hidden',
       },
     }, defaultProp)
+    this.instanceOrbits = null
+    this.$container = null
+    this.requestGradient = this.requestGradient.bind(this)
   }
 
   render(container, orbits) {
+    this.$container = container
     container.textContent = ''
     let { width, height } = container.getBoundingClientRect()
-    this.$orbits.data = dynamicDistributeOrbit(orbits, width, height)
-    this.initStarsContainer(container, width, height)
-    this.initOrbitsContainer(container, width, height)
+    this.initStarsDom(container, width, height)
+    this.initOrbitsDom(container, width, height)
     this.drawStars(width, height, 200)
-    this.drawOrbits()
+    this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
   }
 
-  update() {
-
+  update(orbits) {
+    let { width, height } = this.$container.getBoundingClientRect()
+    this.resetOrbitsGroup(width, height)
+    this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
   }
 
-  dynamicDistributeOrbit() {
-
-
-  }
-
-
-  initStarsContainer(container, width, height) {
+  initStarsDom(container, width, height) {
     this.$stars.container = select(container)
       .append('div')
-      .classed('galaxy-starts', true)
+      .classed('galaxy-stars', true)
       .call(selection => {
         for (let key of Object.keys(this.$stars.style)) {
           selection.style(key, this.$stars.style[key])
@@ -70,7 +71,7 @@ class Galaxy {
     gaussianBlur(this.$stars.defs.append('filter'), void 0, 'blur', 1).attr('id', 'star-gaussian-blur')
   }
 
-  initOrbitsContainer(container, width, height) {
+  initOrbitsDom(container, width, height) {
     this.$orbits.container = select(container)
       .append('div')
       .classed('galaxy-planets', true)
@@ -78,7 +79,6 @@ class Galaxy {
         for (let key of Object.keys(this.$orbits.style)) {
           selection.style(key, this.$orbits.style[key])
         }
-
       })
     this.$orbits.svg = this.$orbits.container.append('svg').attr('width', '100%').attr('height', '100%')
     this.$orbits.defs = this.$orbits.svg.append('defs')
@@ -99,10 +99,34 @@ class Galaxy {
     }
   }
 
-  drawOrbits() {
-    for (let orbit of this.$orbits.data) {
+  resetOrbitsGroup(width, height) {
+    for (let orbit of this.instanceOrbits) {
+      orbit.remove()
+    }
+    this.$orbits.rootGroup.remove()
+    this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
+  }
+
+  requestGradient(baseColor, id) {
+    if (gradientMap.has(id)) {
+      return 'url(#' + id + ')'
+    } else {
+      stereoscopicStop(this.$orbits.defs.append('radialGradient'), baseColor).attr('id', id)
+      gradientMap.set(id, true)
+      return 'url(#' + id +')'
+    }
+  }
+
+  drawOrbits(orbits) {
+    this.instanceOrbits = orbits
+    for (let orbit of orbits) {
       orbit.reset()
-      orbit.run(this.$orbits.rootGroup, true)
+      orbit.run(this.$orbits.rootGroup, {
+        renderOrbit: true,
+        orbitColor: '#123456',
+        planetFilter: 'url(#planet-gaussian-blur)',
+        requestGradient: this.requestGradient,
+      })
     }
   }
 }

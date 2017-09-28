@@ -1,4 +1,8 @@
-import { angleToRadian } from './tool'
+import {
+  angleToRadian,
+  dynamicDistributeAngle,
+  isNullOrUndefined,
+} from './tool'
 export default class Orbit {
   constructor(speed, center = [0, 0]) {
     this.radius = null
@@ -20,13 +24,16 @@ export default class Orbit {
     this.planets.push(planet)
   }
 
-  run(place, renderSelf = false) {
+  run(place, { renderOrbit, orbitColor = '#fff', planetFilter, requestGradient }
+    = {}) {
+    dynamicDistributeAngle(this.planets, this.radius)
     if (this._needInit) {
       this.init(place)
     }
-    if (renderSelf) {
-      this.renderSelf(place)
+    if (renderOrbit) {
+      this.renderSelf(orbitColor)
     }
+    this.renderPlanets(planetFilter, requestGradient)
     let run = () => {
       this.update()
       this.animationFrame = requestAnimationFrame(run)
@@ -34,19 +41,22 @@ export default class Orbit {
     this.animationFrame = requestAnimationFrame(run)
   }
 
-  renderSelf() {
+  renderSelf(orbitColor) {
     this.$group.append('circle')
       .attr('r', this.radius)
       .attr('fill', 'none')
-      .attr('stroke', 'blue')
+      .attr('stroke', orbitColor)
       .attr('stroke-width', 1)
   }
 
-  init(parent) {
-    this.$group = parent.append('g').attr('data-name', 'orbit- group')
+  renderPlanets(planetFilter, requestGradient) {
     for (let planet of this.planets) {
-      planet.create(this.$group)
+      planet.create(this.$group, planetFilter, requestGradient)
     }
+  }
+
+  init(parent) {
+    this.$group = parent.append('g').attr('data-name', 'orbit-group')
     this._needInit = false
   }
 
@@ -66,5 +76,14 @@ export default class Orbit {
 
   setRadius(radius) {
     this.radius = radius
+  }
+
+  remove() {
+    if (this.$group) {
+      this.$group.remove()
+    }
+    if (!isNullOrUndefined(this.animationFrame)) {
+      cancelAnimationFrame(this.animationFrame)
+    }
   }
 }

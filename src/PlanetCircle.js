@@ -1,22 +1,24 @@
-import { select } from 'd3-selection'
-import { angleToRadian } from './tool'
 import Planet from './Planet'
-
 export default class PlanetCircle extends Planet {
-  constructor({ angle, color, size }) {
+  constructor({ color, gradient, size }) {
     super()
-    this.angle = angle
+    this.gradient = gradient
     this.color = color
     this.size = size
+    this.angle = null
     this.$group = null
   }
 
-  create(parent) {
+  create(parent, filter, requestGradient) {
     this.$group = parent.append('g').attr('data-name', 'planet-group')
-
+    if (filter) {
+      this.$group.attr('filter', filter)
+    }
     this.$group
       .append('circle')
-      .attr('fill', this.color)
+      .attr('fill', () => {
+        return requestGradient ? requestGradient(this.color, this.gradient) : this.color
+      })
       .attr('r', this.size)
       .on('mousemove', () => {
         // this.stop()
