@@ -2,7 +2,7 @@ import { randomUniform } from 'd3-random'
 import PlanetCircle from '../src/PlanetCircle'
 import Orbit from '../src/Orbit'
 import galaxy from '../src/Galaxy'
-
+import { largerAnimator } from '../src/Animator'
 // let radiusR = randomUniform(-10, 10)
 let sizeR = randomUniform(10, 20)
 let positionR = randomUniform(0, 360)
@@ -28,6 +28,7 @@ function newPlanet() {
       color: 'orange',
       gradient: 'orange',
       size: sizeR(),
+      animator: largerAnimator,
     })
   )
 }

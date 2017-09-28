@@ -1,7 +1,7 @@
 import Quadtree from 'best-candidate'
 import { select } from 'd3-selection'
 import { randomUniform } from 'd3-random'
-import { gaussianBlur } from './Filter'
+import { gaussianBlur, merge } from './Filter'
 import { stereoscopicStop } from './Gradient'
 import Star from './Star'
 import { dynamicDistributeOrbit } from './tool'
@@ -68,7 +68,10 @@ class Galaxy {
       .append('svg').attr('width', '100%').attr('height', '100%')
     this.$stars.defs = this.$stars.svg.append('defs')
     this.$stars.rootGroup = this.$stars.svg.append('g')
-    gaussianBlur(this.$stars.defs.append('filter'), void 0, 'blur', 1).attr('id', 'star-gaussian-blur')
+    merge(
+      gaussianBlur(this.$stars.defs.append('filter'), void 0, 'blur', 3).attr('id', 'star-gaussian-blur'),
+      ['blur', 'SourceGraphic']
+    )
   }
 
   initOrbitsDom(container, width, height) {
@@ -83,7 +86,11 @@ class Galaxy {
     this.$orbits.svg = this.$orbits.container.append('svg').attr('width', '100%').attr('height', '100%')
     this.$orbits.defs = this.$orbits.svg.append('defs')
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
-    gaussianBlur(this.$orbits.defs.append('filter'), void 0, 'blur', 1).attr('id', 'planet-gaussian-blur')
+    merge(
+      gaussianBlur(this.$orbits.defs.append('filter'), void 0, 'blur', 3).attr('id', 'planet-gaussian-blur'),
+      ['blur', 'SourceGraphic']
+    )
+
   }
 
   drawStars(width, height, count) {
