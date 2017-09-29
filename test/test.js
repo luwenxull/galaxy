@@ -44,6 +44,10 @@ function newOrbit() {
   )
   orbits.push(orbit)
 }
+function removeOrbit() {
+  let randomIndex = Math.floor(randomUniform(0, orbits.length)())
+  orbits[randomIndex].remove()
+}
 
 let container = document.getElementById('container')
 function doRender() {
@@ -53,14 +57,14 @@ function doUpdate() {
   galaxy.update(orbits)
 }
 doRender()
-if (module.hot) {
+/* if (module.hot) {
   module.hot.accept('../src/Galaxy', function() {
     doRender()
   })
   module.hot.accept('../src/Orbit', function() {
     doRender()
   })
-}
+}*/
 
 window._render = doRender
 window._update = doUpdate
@@ -70,5 +74,9 @@ window._renderWithNewOrbit = function() {
 }
 window._renderWithNewPlanet = function() {
   newPlanet()
+  doUpdate()
+}
+window._removeOrbit = function() {
+  removeOrbit()
   doUpdate()
 }

@@ -16,6 +16,7 @@ const defaultProp = {
 const gradientMap = new Map()
 function dynamicDistributeOrbit(orbits, width, height) {
   let maxRadius = Math.min(width, height) / 2
+  orbits = orbits.filter(orbit => !orbit.removed)
   let length = orbits.length
   let radiusUnit = maxRadius / (length + 1)
   for (let i = 0; i < length; i++) {
@@ -59,10 +60,10 @@ class Galaxy {
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
   }
 
-  update(orbits) {
+  update(orbits, callback) {
     let { width, height } = this.$container.getBoundingClientRect()
-    // this.resetOrbitsGroup(width, height)
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
+    callback && callback(this.instanceOrbits)
   }
 
   initStarsDom(container, width, height) {
@@ -108,7 +109,7 @@ class Galaxy {
     let offsetY = height - r
     this.$stars.rootGroup.attr('transform', `translate(${offsetX / 2}, ${offsetY / 2})`)
     let quadtree = new Quadtree(r, r, 10)
-    quadtree.add(200, 1)
+    quadtree.add(500, 1)
     let stars = quadtree.getCandidates().map(candidate => new Star(candidate, 3))
     for (let star of stars) {
       star.twinkle(this.$stars.rootGroup.node(), 'gray', '#03A9F4', randomStep())

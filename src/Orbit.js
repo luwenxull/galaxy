@@ -40,6 +40,7 @@ export default class Orbit {
     this._needInit = true
     this._forceUpdate = false
     this._targetRadius = null
+    this.removed = false
     this.angle = 0
   }
 
@@ -54,11 +55,7 @@ export default class Orbit {
       this.$group = place.append('g').attr('data-name', 'orbit-group')
       this._needInit = false
     }
-    if (renderOrbit) {
-      this.drawOrbit(orbitColor)
-    } else if (!isNullOrUndefined(this.$orbitSelf)) {
-      this.$orbitSelf.remove()
-    }
+    this.drawOrbit(renderOrbit, orbitColor)
     for (let planet of this.planets) {
       planet.create(this.$group, planetFilter, requestGradient)
       updatePositionOfPlanet(planet, this.getRadius(), this.center)
@@ -71,7 +68,7 @@ export default class Orbit {
     this.animationFrame = requestAnimationFrame(run)
   }
 
-  drawOrbit(orbitColor) {
+  drawOrbit(renderOrbit, orbitColor) {
     if (!isNullOrUndefined(this.$orbitSelf)) {
       this._forceUpdate = true
       orbitAnimator.execute(this, this.$orbitSelf, 1000, () => {
@@ -85,6 +82,9 @@ export default class Orbit {
         .attr('fill', 'none')
         .attr('stroke', orbitColor)
         .attr('stroke-width', 1)
+        .style('display', () => {
+          return renderOrbit ? 'initial' : 'none'
+        })
     }
   }
 
@@ -111,6 +111,7 @@ export default class Orbit {
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame)
     }
+    this.removed = true
   }
 
   setRadius(radius) {

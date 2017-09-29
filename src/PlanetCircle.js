@@ -43,6 +43,10 @@ export default class PlanetCircle extends Planet {
       .attr('r', this.getSize())
   }
 
+  remove() {
+    this.$group && this.$group.remove()
+  }
+
   getAngle() {
     return this.angle
   }
