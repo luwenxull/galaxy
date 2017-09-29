@@ -1,8 +1,33 @@
+import { randomUniform } from 'd3-random'
 import {
   angleToRadian,
-  dynamicDistributeAngle,
   isNullOrUndefined,
+  getPlanetPosition,
+  getAngle,
 } from './tool'
+import { orbitAnimator } from './Animator'
+function dynamicDistributeAngle(planets, radius) {
+  let lastPlanet = null
+  let randomAngle = randomUniform(0, 360)
+  for (let planet of planets) {
+    if (isNullOrUndefined(planet.angle)) {
+      if (isNullOrUndefined(lastPlanet)) {
+        planet.setAngle(randomAngle())
+      } else {
+        let increase = getAngle(planet.getTargetSize(), radius)
+        let startAngle = lastPlanet.getAngle()
+        console.log(increase)
+        planet.setAngle(increase + startAngle + 10)
+      }
+    }
+    lastPlanet = planet
+  }
+}
+function updatePositionOfPlanet(planet, radius, center) {
+  let angle = planet.getAngle()
+  let [x, y] = getPlanetPosition(radius, angleToRadian(angle), center)
+  planet.updatePosition(angle, x, y)
+}
 export default class Orbit {
   constructor(speed, center = [0, 0]) {
     this.radius = null
@@ -11,14 +36,11 @@ export default class Orbit {
     this.planets = []
     this.animationFrame = null
     this.$group = null
+    this.$orbitSelf = null
     this._needInit = true
+    this._forceUpdate = false
+    this._targetRadius = null
     this.angle = 0
-  }
-
-  getPlanetPosition(radian) {
-    let x = this.radius * Math.cos(radian)
-    let y = this.radius * Math.sin(radian)
-    return [this.center[0] + x, this.center[1] + y]
   }
 
   addPlanet(planet) {
@@ -29,47 +51,50 @@ export default class Orbit {
     = {}) {
     dynamicDistributeAngle(this.planets, this.radius)
     if (this._needInit) {
-      this.init(place)
+      this.$group = place.append('g').attr('data-name', 'orbit-group')
+      this._needInit = false
     }
     if (renderOrbit) {
-      this.renderSelf(orbitColor)
+      this.drawOrbit(orbitColor)
+    } else if (!isNullOrUndefined(this.$orbitSelf)) {
+      this.$orbitSelf.remove()
     }
-    this.renderPlanets(planetFilter, requestGradient)
+    for (let planet of this.planets) {
+      planet.create(this.$group, planetFilter, requestGradient)
+      updatePositionOfPlanet(planet, this.getRadius(), this.center)
+    }
     let run = () => {
       this.update()
       this.animationFrame = requestAnimationFrame(run)
     }
+    !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame)
     this.animationFrame = requestAnimationFrame(run)
   }
 
-  renderSelf(orbitColor) {
-    this.$group.append('circle')
-      .attr('r', this.radius)
-      .attr('fill', 'none')
-      .attr('stroke', orbitColor)
-      .attr('stroke-width', 1)
-  }
-
-  renderPlanets(planetFilter, requestGradient) {
-    for (let planet of this.planets) {
-      planet.create(this.$group, planetFilter, requestGradient)
-      let angle = planet.getAngle()
-      planet.update(angle, ...this.getPlanetPosition(angleToRadian(angle)))
+  drawOrbit(orbitColor) {
+    if (!isNullOrUndefined(this.$orbitSelf)) {
+      this._forceUpdate = true
+      orbitAnimator.execute(this, this.$orbitSelf, 1000, () => {
+        // When the transition subsequently starts,
+        // it interrupts the active transition of the same name on the same element
+        this._forceUpdate = false
+      })
+    } else {
+      this.$orbitSelf = this.$group.append('circle')
+        .attr('r', this.getRadius())
+        .attr('fill', 'none')
+        .attr('stroke', orbitColor)
+        .attr('stroke-width', 1)
     }
   }
 
-  init(parent) {
-    this.$group = parent.append('g').attr('data-name', 'orbit-group')
-    this._needInit = false
-  }
-
   update() {
-    /* for (let planet of this.planets) {
-      let angle = planet.getAngle() + this.speed
-      let [x, y] = this.getPlanetPosition(angleToRadian(angle))
-      planet.update(angle, x, y)
-    } */
-    this.angle += 0.1
+    if (this._forceUpdate) {
+      for (let planet of this.planets) {
+        updatePositionOfPlanet(planet, this.getRadius(), this.center)
+      }
+    }
+    this.angle += this.speed
     this.$group.style('transform', `rotate(${this.angle}deg)`)
   }
 
@@ -79,10 +104,6 @@ export default class Orbit {
     this.animationFrame !== null && cancelAnimationFrame(this.animationFrame)
   }
 
-  setRadius(radius) {
-    this.radius = radius
-  }
-
   remove() {
     if (this.$group) {
       this.$group.remove()
@@ -90,5 +111,24 @@ export default class Orbit {
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame)
     }
+  }
+
+  setRadius(radius) {
+    this.radius = radius
+  }
+
+  getRadius() {
+    if (isNullOrUndefined(this.radius)) {
+      this.radius = this._targetRadius
+    }
+    return this.radius
+  }
+
+  setTargetRadius(lastRadius) {
+    this._targetRadius = lastRadius
+  }
+
+  getTargetRadius() {
+    return this._targetRadius
   }
 }

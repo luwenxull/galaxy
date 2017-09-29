@@ -1,35 +1,31 @@
+function throwError(msg) {
+  throw Error(msg)
+}
 export default class Planet {
   constructor() {
     if (new.target.name === 'Planet') {
-      throw Error('Do not call new Planet() directly!')
+      throwError('Do not call new Planet() directly!')
     }
   }
 
 
   create() {
-    throw Error('Must overwrite create method')
+    throwError('Must overwrite create method')
   }
 
   renderOrbit() {
-    throw Error('Must overwrite renderOrbit method')
+    throwError('Must overwrite renderOrbit method')
   }
 
   run(place) {
-    if (!this.$group) {
-      this.create(place)
-    }
-    let run = () => {
-      this.update()
-      this.animationFrame = requestAnimationFrame(run)
-    }
-    this.animationFrame = requestAnimationFrame(run)
+    throwError('Must overwrite run method')
   }
 
-  update() {
-    throw Error('Must overwrite update method')
+  updatePosition() {
+    throwError('Must overwrite updatePosition method')
   }
 
   stop() {
-    cancelAnimationFrame(this.animationFrame)
+    throwError('Must overwrite stop method')
   }
 }

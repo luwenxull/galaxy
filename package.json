@@ -7,7 +7,9 @@
   "scripts": {
     "build": "./node_modules/.bin/webpack --progress --profile --colors",
     "watch": "./node_modules/.bin/webpack --progress --profile --colors -w",
-    "start": "./node_modules/.bin/webpack-dev-server --open"
+    "start": "./node_modules/.bin/webpack-dev-server --open",
+    "lint": "./node_modules/.bin/eslint --color ./src",
+    "lint:fix": "./node_modules/.bin/eslint --fix ./src"
   },
   "dependencies": {
     "best-candidate": "^1.0.3"

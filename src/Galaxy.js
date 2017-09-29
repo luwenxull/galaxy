@@ -4,7 +4,6 @@ import { randomUniform } from 'd3-random'
 import { gaussianBlur, merge } from './Filter'
 import { stereoscopicStop } from './Gradient'
 import Star from './Star'
-import { dynamicDistributeOrbit } from './tool'
 const randomStep = randomUniform(0.01, 0.02)
 const defaultProp = {
   container: null,
@@ -15,6 +14,17 @@ const defaultProp = {
   data: null,
 }
 const gradientMap = new Map()
+function dynamicDistributeOrbit(orbits, width, height) {
+  let maxRadius = Math.min(width, height) / 2
+  let length = orbits.length
+  let radiusUnit = maxRadius / (length + 1)
+  for (let i = 0; i < length; i++) {
+    let orbit = orbits[i]
+    let targetRadius = (i + 1) * radiusUnit
+    orbit.setTargetRadius(targetRadius)
+  }
+  return orbits
+}
 class Galaxy {
   constructor() {
     this.$stars = Object.assign({
@@ -51,7 +61,7 @@ class Galaxy {
 
   update(orbits) {
     let { width, height } = this.$container.getBoundingClientRect()
-    this.resetOrbitsGroup(width, height)
+    // this.resetOrbitsGroup(width, height)
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
   }
 
@@ -90,7 +100,6 @@ class Galaxy {
       gaussianBlur(this.$orbits.defs.append('filter'), void 0, 'blur', 3).attr('id', 'planet-gaussian-blur'),
       ['blur', 'SourceGraphic']
     )
-
   }
 
   drawStars(width, height, count) {
@@ -127,7 +136,7 @@ class Galaxy {
   drawOrbits(orbits) {
     this.instanceOrbits = orbits
     for (let orbit of orbits) {
-      orbit.reset()
+      // orbit.reset()
       orbit.run(this.$orbits.rootGroup, {
         renderOrbit: true,
         orbitColor: '#123456',
