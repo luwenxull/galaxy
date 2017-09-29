@@ -16,7 +16,7 @@ const defaultProp = {
 const gradientMap = new Map()
 function dynamicDistributeOrbit(orbits, width, height) {
   let maxRadius = Math.min(width, height) / 2
-  orbits = orbits.filter(orbit => !orbit.removed)
+  // orbits = orbits.filter(orbit => !orbit.removed)
   let length = orbits.length
   let radiusUnit = maxRadius / (length + 1)
   for (let i = 0; i < length; i++) {

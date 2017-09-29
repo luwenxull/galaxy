@@ -47,6 +47,7 @@ function newOrbit() {
 function removeOrbit() {
   let randomIndex = Math.floor(randomUniform(0, orbits.length)())
   orbits[randomIndex].remove()
+  orbits.splice(randomIndex, 1)
 }
 
 let container = document.getElementById('container')
