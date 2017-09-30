@@ -1,56 +1,55 @@
 import { randomUniform } from 'd3-random'
-import PlanetCircle from '../src/PlanetCircle'
-import Orbit from '../src/Orbit'
-import galaxy from '../src/Galaxy'
 import { planetAnimator } from '../src/Animator'
+import galaxy from '../src/Galaxy'
+import Orbit from '../src/Orbit'
+import { PlanetCircle } from '../src/PlanetCircle'
 // let radiusR = randomUniform(-10, 10)
-let sizeR = randomUniform(10, 20)
-let positionR = randomUniform(0, 360)
-let speedR = randomUniform(0.1, 0.2)
-let orbitNum = 1
-let orbits = []
+const sizeR = randomUniform(10, 20)
+const positionR = randomUniform(0, 360)
+const speedR = randomUniform(0.1, 0.2)
+const orbitNum = 5
+const orbits = []
 for (let i = 0; i < orbitNum; i++) {
-  let orbit = new Orbit(speedR())
+  const orbit = new Orbit(speedR())
   orbit.addPlanet(
     new PlanetCircle({
       color: 'red',
       gradient: 'red',
       size: sizeR(),
-    })
+    }),
   )
   orbits.push(orbit)
 }
 function newPlanet() {
-  let randomIndex = Math.floor(randomUniform(0, orbits.length)())
-  let orbit = orbits[randomIndex]
+  const randomIndex = Math.floor(randomUniform(0, orbits.length)())
+  const orbit = orbits[randomIndex]
   orbit.addPlanet(
     new PlanetCircle({
       color: 'orange',
       gradient: 'orange',
+
       size: sizeR(),
-      animator: planetAnimator,
-    })
+    }),
   )
 }
 function newOrbit() {
-  let orbit = new Orbit(speedR())
+  const orbit = new Orbit(speedR())
   orbit.addPlanet(
     new PlanetCircle({
-      angle: positionR(),
       color: 'yellow',
       gradient: 'yellow',
       size: sizeR(),
-    })
+    }),
   )
   orbits.push(orbit)
 }
 function removeOrbit() {
-  let randomIndex = Math.floor(randomUniform(0, orbits.length)())
+  const randomIndex = Math.floor(randomUniform(0, orbits.length)())
   orbits[randomIndex].remove()
   orbits.splice(randomIndex, 1)
 }
 
-let container = document.getElementById('container')
+const container = document.getElementById('container')
 function doRender() {
   galaxy.render(container, orbits)
 }
@@ -66,6 +65,17 @@ doRender()
     doRender()
   })
 }*/
+
+declare global {
+  // tslint:disable-next-line:interface-name
+  interface Window {
+    _render()
+    _update()
+    _renderWithNewOrbit()
+    _renderWithNewPlanet()
+    _removeOrbit()
+  }
+}
 
 window._render = doRender
 window._update = doUpdate

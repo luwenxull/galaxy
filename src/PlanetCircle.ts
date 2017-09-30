@@ -1,19 +1,28 @@
-import Planet from './Planet'
-import { isNullOrUndefined } from './tool'
 import { planetAnimator } from './Animator'
-export default class PlanetCircle extends Planet {
-  constructor({ color, gradient, size, animator }) {
+import { IPlanet, Planet } from './Planet'
+import { isNullOrUndefined } from './tool'
+
+export interface IPlanetCircle extends IPlanet {
+  getSize(): number
+  setSize(size: number): void
+  getTargetSize(): number
+  setTargetSize(size: number): void
+}
+
+export class PlanetCircle extends Planet implements IPlanetCircle {
+  private color: string
+  private size: number
+  private gradient?: string
+  private _targetSize: number
+  constructor({ color = '#fff', size = 0, gradient = null} = {}) {
     super()
-    this.gradient = gradient
     this.color = color
+    this.gradient = gradient
     this.size = 0
     this._targetSize = size
-    this.animator = animator
-    this.angle = null
-    this.$group = null
   }
 
-  create(parent, filter, requestGradient) {
+  public create(parent, filter, requestGradient) {
     if (isNullOrUndefined(this.$group)) {
       this.$group = parent.append('g').attr('data-name', 'planet-group')
       if (filter) {
@@ -29,13 +38,12 @@ export default class PlanetCircle extends Planet {
         })
         .on('mouseleave', () => {
           // this.run()
-        }), 1000
-      )
+        }), 1000)
     }
   }
 
-  updatePosition(angle, x, y) {
-    this.setAngle(angle)
+  public updatePosition(angle, x, y) {
+    super.updatePosition(angle, x, y)
     this.$group
       .select('circle')
       .attr('cx', x)
@@ -43,31 +51,19 @@ export default class PlanetCircle extends Planet {
       .attr('r', this.getSize())
   }
 
-  remove() {
-    this.$group && this.$group.remove()
-  }
-
-  getAngle() {
-    return this.angle
-  }
-
-  setAngle(angle) {
-    this.angle = angle
-  }
-
-  getSize() {
+  public getSize() {
     return this.size
   }
 
-  setSize(size) {
+  public setSize(size) {
     this.size = size
   }
 
-  getTargetSize() {
+  public getTargetSize() {
     return this._targetSize
   }
 
-  setTargetSize(size) {
+  public setTargetSize(size) {
     this._targetSize = size
   }
 }

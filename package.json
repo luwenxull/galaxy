@@ -6,19 +6,24 @@
   "license": "MIT",
   "scripts": {
     "build": "./node_modules/.bin/webpack --progress --profile --colors",
+    "build:ts": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/webpack --progress --profile --colors -w",
     "start": "./node_modules/.bin/webpack-dev-server --open",
-    "lint": "./node_modules/.bin/eslint --color ./src",
-    "lint:fix": "./node_modules/.bin/eslint --fix ./src"
+    "lint": "./node_modules/.bin/tslint ./src",
+    "lint:fix": "./node_modules/.bin/tslint --fix ./src"
   },
   "dependencies": {
     "best-candidate": "^1.0.3"
   },
   "devDependencies": {
+    "@types/d3": "^4.10.1",
     "clean-webpack-plugin": "^0.1.16",
     "eslint": "^4.5.0",
     "eslint-config-google": "^0.9.1",
     "html-webpack-plugin": "^2.30.1",
+    "ts-loader": "^2.3.7",
+    "tslint": "^5.7.0",
+    "typescript": "^2.5.3",
     "webpack": "^3.5.5",
     "webpack-dev-server": "^2.8.2"
   }

@@ -5,7 +5,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = function(env) {
   return {
     entry: {
-      index: './test/test.js',
+      index: './test/test.ts',
     },
     output: {
       path: path.join(__dirname, 'dist'),
@@ -21,14 +21,20 @@ module.exports = function(env) {
     ],
     devtool: 'inline-source-map',
     devServer: {
-      contentBase: './dist',
+      contentBase: './devServer',
       hot: true,
     },
     module: {
-      rules: [],
+      rules: [
+        {
+          test: /\.ts$/,
+          use: ['ts-loader'],
+          exclude: /node_modules/,
+        },
+      ],
     },
     resolve: {
-      extensions: ['.js'],
+      extensions: ['.js', '.ts'],
     },
   }
 };
