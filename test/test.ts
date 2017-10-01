@@ -1,14 +1,15 @@
 import { randomUniform } from 'd3-random'
 import { planetAnimator } from '../src/Animator'
-import galaxy from '../src/Galaxy'
-import Orbit from '../src/Orbit'
-import { PlanetCircle } from '../src/PlanetCircle'
+import { Galaxy, IGalaxy} from '../src/Galaxy'
+import { IOrbit, Orbit } from '../src/Orbit'
+import { IPlanetCircle, PlanetCircle } from '../src/PlanetCircle'
 // let radiusR = randomUniform(-10, 10)
+const galaxy: IGalaxy = new Galaxy()
 const sizeR = randomUniform(10, 20)
 const positionR = randomUniform(0, 360)
 const speedR = randomUniform(0.1, 0.2)
 const orbitNum = 5
-const orbits = []
+const orbits: IOrbit[] = []
 for (let i = 0; i < orbitNum; i++) {
   const orbit = new Orbit(speedR())
   orbit.addPlanet(
@@ -27,7 +28,6 @@ function newPlanet() {
     new PlanetCircle({
       color: 'orange',
       gradient: 'orange',
-
       size: sizeR(),
     }),
   )

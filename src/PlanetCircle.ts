@@ -1,6 +1,9 @@
+import { BaseType, Selection } from 'd3-selection'
 import { planetAnimator } from './Animator'
 import { IPlanet, Planet } from './Planet'
 import { isNullOrUndefined } from './tool'
+
+type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
 export interface IPlanetCircle extends IPlanet {
   getSize(): number
@@ -22,7 +25,10 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     this._targetSize = size
   }
 
-  public create(parent, filter, requestGradient) {
+  public create(
+    parent: selectionGenerics,
+    filter: string,
+    requestGradient: (baseColor: string, id: string) => string) {
     if (isNullOrUndefined(this.$group)) {
       this.$group = parent.append('g').attr('data-name', 'planet-group')
       if (filter) {
@@ -42,28 +48,28 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     }
   }
 
-  public updatePosition(angle, x, y) {
+  public updatePosition(angle: number, x: number, y: number): void {
     super.updatePosition(angle, x, y)
     this.$group
       .select('circle')
       .attr('cx', x)
       .attr('cy', y)
-      .attr('r', this.getSize())
+      .attr('r', this.size)
   }
 
-  public getSize() {
+  public getSize(): number {
     return this.size
   }
 
-  public setSize(size) {
+  public setSize(size: number) {
     this.size = size
   }
 
-  public getTargetSize() {
+  public getTargetSize(): number {
     return this._targetSize
   }
 
-  public setTargetSize(size) {
+  public setTargetSize(size: number) {
     this._targetSize = size
   }
 }

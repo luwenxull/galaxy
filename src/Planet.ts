@@ -1,9 +1,12 @@
-import { Selection } from '../node_modules/@types/d3-selection/index'
+import { BaseType, Selection } from 'd3-selection'
 import { isNullOrUndefined } from './tool'
-type selectionGenerics = Selection<SVGElement, any, SVGElement, any>
+type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
 export interface IPlanet {
-  create(parent: selectionGenerics, filter: string, requestGradient: (id: string) => string): void
+  create(
+    parent: selectionGenerics,
+    filter: string,
+    requestGradient: (baseColor: string, id: string) => string): void
   updatePosition(angle: number, x: number, y: number): void
   remove(): void
   getAngle(): number
@@ -20,7 +23,10 @@ export class Planet implements IPlanet {
     this.$group = null
   }
 
-  public create(parent: selectionGenerics, filter: string, requestGradient: (id: string) => string) {}
+  public create(
+    parent: selectionGenerics,
+    filter: string,
+    requestGradient: (baseColor: string, id: string) => string) {}
 
   public updatePosition(angle: number, x: number, y: number) {
     this.setAngle(angle)

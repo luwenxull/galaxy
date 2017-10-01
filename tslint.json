@@ -9,7 +9,9 @@
         "only-arrow-functions": false,
         "quotemark": [true, "single"],
         "no-empty": false,
-        "variable-name": [false]
+        "variable-name": [false],
+        "no-unused-expression": false,
+        "arrow-parens": false
     },
     "rulesDirectory": []
 }

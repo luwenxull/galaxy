@@ -1,48 +1,77 @@
 import Quadtree from 'best-candidate'
-import { select } from 'd3-selection'
 import { randomUniform } from 'd3-random'
+import { select } from 'd3-selection'
+import { BaseType, Selection } from 'd3-selection'
 import { gaussianBlur, merge } from './Filter'
 import { stereoscopicStop } from './Gradient'
-import Star from './Star'
+import { IOrbit } from './Orbit'
+import { IStar, Star} from './Star'
+
+type selectionGenerics = Selection<BaseType, any, BaseType, any>
+interface IDefaultProp {
+  container: selectionGenerics
+  data: any
+  defs: selectionGenerics
+  filters: selectionGenerics
+  rootGroup: selectionGenerics
+  svg: selectionGenerics
+}
+
 const randomStep = randomUniform(0.01, 0.02)
-const defaultProp = {
+const defaultProp: IDefaultProp = {
   container: null,
-  svg: null,
-  defs: null,
-  root: null,
-  filters: null,
   data: null,
+  defs: null,
+  filters: null,
+  rootGroup: null,
+  svg: null,
 }
 const gradientMap = new Map()
-function dynamicDistributeOrbit(orbits, width, height) {
-  let maxRadius = Math.min(width, height) / 2
+function dynamicDistributeOrbit(orbits: IOrbit[], width: number, height: number) {
+  const maxRadius = Math.min(width, height) / 2
   // orbits = orbits.filter(orbit => !orbit.removed)
-  let length = orbits.length
-  let radiusUnit = maxRadius / (length + 1)
+  const length = orbits.length
+  const radiusUnit = maxRadius / (length + 1)
   for (let i = 0; i < length; i++) {
-    let orbit = orbits[i]
-    let targetRadius = (i + 1) * radiusUnit
+    const orbit = orbits[i]
+    const targetRadius = (i + 1) * radiusUnit
     orbit.setTargetRadius(targetRadius)
   }
   return orbits
 }
-class Galaxy {
+
+export interface IGalaxy {
+  $container: HTMLElement
+  instanceOrbits: IOrbit[]
+  render(container: HTMLElement, orbits: IOrbit[]): void
+  update(orbits: IOrbit[], callback?: (orbits: IOrbit[]) => void): void
+}
+
+export class Galaxy implements IGalaxy {
+  public $container: HTMLElement
+  public instanceOrbits: IOrbit[]
+  private $stars: IDefaultProp & {
+    style: object,
+  }
+  private $orbits: IDefaultProp & {
+    style: object,
+  }
   constructor() {
     this.$stars = Object.assign({
       style: {
-        position: 'absolute',
+        height: '100%',
         left: 0,
+        overflow: 'hidden',
+        position: 'absolute',
         top: 0,
         width: '100%',
-        height: '100%',
-        overflow: 'hidden',
       },
     }, defaultProp)
     this.$orbits = Object.assign({
       style: {
-        width: '100%',
         height: '100%',
         overflow: 'hidden',
+        width: '100%',
       },
     }, defaultProp)
     this.instanceOrbits = null
@@ -50,28 +79,28 @@ class Galaxy {
     this.requestGradient = this.requestGradient.bind(this)
   }
 
-  render(container, orbits) {
+  public render(container: HTMLElement, orbits: IOrbit[]) {
     this.$container = container
     container.textContent = ''
-    let { width, height } = container.getBoundingClientRect()
+    const { width, height } = container.getBoundingClientRect()
     this.initStarsDom(container, width, height)
     this.initOrbitsDom(container, width, height)
     this.drawStars(width, height, 200)
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
   }
 
-  update(orbits, callback) {
-    let { width, height } = this.$container.getBoundingClientRect()
+  public update(orbits: IOrbit[], callback?: (orbits: IOrbit[]) => void) {
+    const { width, height } = this.$container.getBoundingClientRect()
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
     callback && callback(this.instanceOrbits)
   }
 
-  initStarsDom(container, width, height) {
+  private initStarsDom(container: HTMLElement, width: number, height: number): void {
     this.$stars.container = select(container)
       .append('div')
       .classed('galaxy-stars', true)
-      .call(selection => {
-        for (let key of Object.keys(this.$stars.style)) {
+      .call((selection) => {
+        for (const key of Object.keys(this.$stars.style)) {
           selection.style(key, this.$stars.style[key])
         }
       })
@@ -81,16 +110,16 @@ class Galaxy {
     this.$stars.rootGroup = this.$stars.svg.append('g')
     merge(
       gaussianBlur(this.$stars.defs.append('filter'), void 0, 'blur', 3).attr('id', 'star-gaussian-blur'),
-      ['blur', 'SourceGraphic']
+      ['blur', 'SourceGraphic'],
     )
   }
 
-  initOrbitsDom(container, width, height) {
+  private initOrbitsDom(container: HTMLElement, width: number, height: number) {
     this.$orbits.container = select(container)
       .append('div')
       .classed('galaxy-planets', true)
-      .call(selection => {
-        for (let key of Object.keys(this.$orbits.style)) {
+      .call((selection) => {
+        for (const key of Object.keys(this.$orbits.style)) {
           selection.style(key, this.$orbits.style[key])
         }
       })
@@ -99,53 +128,51 @@ class Galaxy {
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
     merge(
       gaussianBlur(this.$orbits.defs.append('filter'), void 0, 'blur', 3).attr('id', 'planet-gaussian-blur'),
-      ['blur', 'SourceGraphic']
+      ['blur', 'SourceGraphic'],
     )
   }
 
-  drawStars(width, height, count) {
-    let r = Math.sqrt(width * width + height * height)
-    let offsetX = width - r
-    let offsetY = height - r
+  private drawStars(width: number, height: number, count: number = 500) {
+    const r = Math.sqrt(width * width + height * height)
+    const offsetX = width - r
+    const offsetY = height - r
     this.$stars.rootGroup.attr('transform', `translate(${offsetX / 2}, ${offsetY / 2})`)
-    let quadtree = new Quadtree(r, r, 10)
-    quadtree.add(500, 1)
-    let stars = quadtree.getCandidates().map(candidate => new Star(candidate, 3))
-    for (let star of stars) {
+    const quadtree = new Quadtree(r, r, 10)
+    quadtree.add(count, 1)
+    const stars: IStar[] = quadtree.getCandidates().map((candidate) => new Star(candidate, 3))
+    for (const star of stars) {
       star.twinkle(this.$stars.rootGroup.node(), 'gray', '#03A9F4', randomStep())
     }
   }
 
-  resetOrbitsGroup(width, height) {
-    for (let orbit of this.instanceOrbits) {
+  private resetOrbitsGroup(width: number, height: number) {
+    for (const orbit of this.instanceOrbits) {
       orbit.remove()
     }
     this.$orbits.rootGroup.remove()
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
   }
 
-  requestGradient(baseColor, id) {
+  private requestGradient(baseColor: string, id: string): string {
     if (gradientMap.has(id)) {
       return 'url(#' + id + ')'
     } else {
       stereoscopicStop(this.$orbits.defs.append('radialGradient'), baseColor).attr('id', id)
       gradientMap.set(id, true)
-      return 'url(#' + id +')'
+      return 'url(#' + id + ')'
     }
   }
 
-  drawOrbits(orbits) {
+  private drawOrbits(orbits: IOrbit[]) {
     this.instanceOrbits = orbits
-    for (let orbit of orbits) {
+    for (const orbit of orbits) {
       // orbit.reset()
       orbit.run(this.$orbits.rootGroup, {
-        renderOrbit: true,
         orbitColor: '#123456',
         planetFilter: 'url(#planet-gaussian-blur)',
+        renderOrbit: true,
         requestGradient: this.requestGradient,
       })
     }
   }
 }
-
-export default new Galaxy()
