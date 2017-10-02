@@ -31,11 +31,12 @@ function dynamicDistributeAngle(planets: IPlanet[], radius: number): void {
   }
 }
 
-function updatePositionOfPlanet(planet: IPlanet, radius: number, center: number[]) {
+/* function updatePositionOfPlanet(planet: IPlanet, radius: number, center: number[]) {
   const angle = planet.getAngle()
+  planet.setAngle(angle + Orbit)
   const [x, y] = getPlanetPosition(radius, angleToRadian(angle), center)
   planet.updatePosition(angle, x, y)
-}
+} */
 
 export interface IOrbit {
   radius: number
@@ -100,7 +101,7 @@ export class Orbit implements IOrbit {
     this.drawOrbit(renderOrbit, orbitColor)
     for (const planet of this.planets) {
       planet.create(this.$group, planetFilter, requestGradient)
-      updatePositionOfPlanet(planet, this.getRadius(), this.center)
+      // updatePositionOfPlanet(planet, this.getRadius(), this.center)
     }
     const run = () => {
       this.update()
@@ -175,12 +176,16 @@ export class Orbit implements IOrbit {
   }
 
   private update() {
-    if (this._forceUpdate) {
+    // if (this._forceUpdate) {
+    if (true) {
       for (const planet of this.planets) {
-        updatePositionOfPlanet(planet, this.getRadius(), this.center)
+        const angle = planet.getAngle()
+        const newAngle = angle + this.speed
+        const [x, y] = getPlanetPosition(this.radius, angleToRadian(newAngle), this.center)
+        planet.updatePosition(newAngle, x, y)
       }
     }
-    this.angle += this.speed
-    this.$group.style('transform', `rotate(${this.angle}deg)`)
+    // this.angle += this.speed
+    // this.$group.style('transform', `rotate(${this.angle}deg)`)
   }
 }

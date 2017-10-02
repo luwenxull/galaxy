@@ -2,7 +2,11 @@ import { BaseType, Selection } from 'd3-selection'
 import { transition } from 'd3-transition' // eslint-disable-line no-unused-vars
 import { IOrbit } from './Orbit'
 import { IPlanetCircle } from './PlanetCircle'
+
 type selectionGenerics = Selection<BaseType, any, BaseType, any>
+
+transition(null)
+
 export let planetAnimator = {
   execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
     node

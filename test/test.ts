@@ -36,7 +36,7 @@ function newPlanet() {
 function removePlanet(): void {
   const randomIndex: number = Math.floor(randomUniform(0, orbits.length)())
   const randomPlanetIndex: number = Math.floor(randomUniform(0, orbits[randomIndex].planets.length)())
-  orbits[randomIndex].planets[randomPlanetIndex].remove()
+  orbits[randomIndex].removePlanet(orbits[randomIndex].planets[randomPlanetIndex])
 }
 
 function newOrbit() {

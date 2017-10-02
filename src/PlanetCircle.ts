@@ -52,9 +52,14 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     super.updatePosition(angle, x, y)
     this.$group
       .select('circle')
-      .attr('cx', x)
-      .attr('cy', y)
+      .attr('cx', this.x)
+      .attr('cy', this.y)
       .attr('r', this.size)
+  }
+
+  public remove() {
+    this._targetSize = 0
+    planetAnimator.execute(this, this.$group.select('circle'), 1000)
   }
 
   public getSize(): number {
