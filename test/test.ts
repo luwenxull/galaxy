@@ -32,6 +32,13 @@ function newPlanet() {
     }),
   )
 }
+
+function removePlanet(): void {
+  const randomIndex: number = Math.floor(randomUniform(0, orbits.length)())
+  const randomPlanetIndex: number = Math.floor(randomUniform(0, orbits[randomIndex].planets.length)())
+  orbits[randomIndex].planets[randomPlanetIndex].remove()
+}
+
 function newOrbit() {
   const orbit = new Orbit(speedR())
   orbit.addPlanet(
@@ -74,6 +81,7 @@ declare global {
     _renderWithNewOrbit()
     _renderWithNewPlanet()
     _removeOrbit()
+    _removePlanet()
   }
 }
 
@@ -89,5 +97,9 @@ window._renderWithNewPlanet = function() {
 }
 window._removeOrbit = function() {
   removeOrbit()
+  doUpdate()
+}
+window._removePlanet = function() {
+  removePlanet()
   doUpdate()
 }

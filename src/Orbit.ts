@@ -9,7 +9,9 @@ import {
   getPlanetPosition,
   isNullOrUndefined,
 } from './tool'
+
 type selectionGenerics = Selection<BaseType, any, BaseType, any>
+
 function dynamicDistributeAngle(planets: IPlanet[], radius: number): void {
   let lastPlanet = null
   const randomAngle = randomUniform(0, 360)
@@ -28,6 +30,7 @@ function dynamicDistributeAngle(planets: IPlanet[], radius: number): void {
     lastPlanet = planet
   }
 }
+
 function updatePositionOfPlanet(planet: IPlanet, radius: number, center: number[]) {
   const angle = planet.getAngle()
   const [x, y] = getPlanetPosition(radius, angleToRadian(angle), center)
@@ -43,6 +46,7 @@ export interface IOrbit {
   addPlanet(planet: IPlanet): void
   run(place: selectionGenerics, config?: object): void
   remove(): void
+  removePlanet(planet: IPlanet): void
   getRadius(): number
   setRadius(radius: number): void
   getTargetRadius(): number
@@ -120,6 +124,15 @@ export class Orbit implements IOrbit {
       cancelAnimationFrame(this.animationFrame)
     }
     this._removed = true
+  }
+
+  public removePlanet(planetNeedRemove: IPlanet) {
+    for (let i = 0; i < this.planets.length; i += 1) {
+      if (planetNeedRemove === this.planets[i]) {
+        planetNeedRemove.remove()
+        this.planets.splice(i, 1)
+      }
+    }
   }
 
   public setRadius(radius: number): void {

@@ -11,7 +11,8 @@
         "no-empty": false,
         "variable-name": [false],
         "no-unused-expression": false,
-        "arrow-parens": false
+        "arrow-parens": false,
+        "prefer-for-of": false
     },
     "rulesDirectory": []
 }
