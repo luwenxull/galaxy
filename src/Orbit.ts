@@ -4,7 +4,6 @@ import { orbitAnimator } from './Animator'
 import { IPlanet } from './Planet'
 import { IPlanetCircle, PlanetCircle } from './PlanetCircle'
 import {
-  angleToRadian,
   getAngle,
   getPlanetPosition,
   isNullOrUndefined,
@@ -12,22 +11,37 @@ import {
 
 type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
-function dynamicDistributeAngle(planets: IPlanet[], radius: number): void {
-  let lastPlanet = null
+function someNew(planets: IPlanet[]): boolean {
+  for (let i = 0; i < planets.length; i++) {
+    if (isNullOrUndefined(planets[i].getTargetAngle())) {
+      return true
+    }
+  }
+  return false
+}
+
+function dynamicDistributeAngle(planets: IPlanet[], radius: number, lastLength: number): void {
+  let startAngle: number = null
   const randomAngle = randomUniform(0, 360)
-  for (const planet of planets) {
-    if (isNullOrUndefined(planet.getAngle())) {
-      if (isNullOrUndefined(lastPlanet)) {
-        planet.setAngle(randomAngle())
-      } else {
-        if (planet instanceof PlanetCircle) {
-          const increase = getAngle(planet.getTargetSize(), radius)
-          const startAngle = lastPlanet.getAngle()
-          planet.setAngle(increase + startAngle + 10)
+  const len = planets.length
+  const angleUnit = 360 / len
+  const ifSomeNew = someNew(planets)
+  if (lastLength !== len || someNew(planets)) {
+    for (let i = 0; i < planets.length; i++) {
+      const planet = planets[i]
+      if (i === 0) {
+        if (!isNullOrUndefined(planet.getAngle())) {
+          startAngle = planet.getTargetAngle()
+        } else {
+          startAngle = randomAngle()
         }
       }
+      const positionIndex = len === 1 ? i : (i + 1)
+      planet.setTargetAngle(startAngle + angleUnit * positionIndex)
+      if (!isNullOrUndefined(planet.getAngle())) {
+        planet.requesetAngleAnimation()
+      }
     }
-    lastPlanet = planet
   }
 }
 
@@ -61,12 +75,14 @@ export class Orbit implements IOrbit {
   public angle: number
   public planets: IPlanet[]
   private animationFrame: any
+  private reservedAngle: number[]
   private $group: selectionGenerics
   private $orbitSelf: selectionGenerics
   private _needInit: boolean
   private _forceUpdate: boolean
   private _targetRadius: number
   private _removed: boolean
+  private _lastLength: number
   constructor(speed: number, center = [0, 0]) {
     this.radius = null
     this.center = center
@@ -74,12 +90,14 @@ export class Orbit implements IOrbit {
     this.angle = 0
     this.planets = []
     this.animationFrame = null
+    this.reservedAngle = []
     this.$group = null
     this.$orbitSelf = null
     this._needInit = true
     this._forceUpdate = false
     this._targetRadius = null
     this._removed = false
+    this._lastLength = null
   }
 
   public addPlanet(planet: IPlanet) {
@@ -93,7 +111,8 @@ export class Orbit implements IOrbit {
     requestGradient = null,
   }
     = {}) {
-    dynamicDistributeAngle(this.planets, this.radius)
+    dynamicDistributeAngle(this.planets, this.radius, this._lastLength)
+    this._lastLength = this.planets.length
     if (this._needInit) {
       this.$group = place.append('g').attr('data-name', 'orbit-group')
       this._needInit = false
@@ -104,7 +123,11 @@ export class Orbit implements IOrbit {
       // updatePositionOfPlanet(planet, this.getRadius(), this.center)
     }
     const run = () => {
-      this.update()
+      // this.update()
+      for (const planet of this.planets) {
+        planet.setTargetAngle(this.speed + planet.getTargetAngle())
+        planet.updatePosition(this.radius, this.center)
+      }
       this.animationFrame = requestAnimationFrame(run)
     }
     !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame)
@@ -173,19 +196,5 @@ export class Orbit implements IOrbit {
           return renderOrbit ? 'initial' : 'none'
         })
     }
-  }
-
-  private update() {
-    // if (this._forceUpdate) {
-    if (true) {
-      for (const planet of this.planets) {
-        const angle = planet.getAngle()
-        const newAngle = angle + this.speed
-        const [x, y] = getPlanetPosition(this.radius, angleToRadian(newAngle), this.center)
-        planet.updatePosition(newAngle, x, y)
-      }
-    }
-    // this.angle += this.speed
-    // this.$group.style('transform', `rotate(${this.angle}deg)`)
   }
 }

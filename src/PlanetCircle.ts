@@ -1,7 +1,14 @@
 import { BaseType, Selection } from 'd3-selection'
-import { planetAnimator } from './Animator'
+import {
+  planetAngleAnimator,
+  planetSizeAnimator,
+} from './Animator'
 import { IPlanet, Planet } from './Planet'
-import { isNullOrUndefined } from './tool'
+import {
+  angleToRadian,
+  getPlanetPosition,
+  isNullOrUndefined,
+} from './tool'
 
 type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
@@ -15,8 +22,8 @@ export interface IPlanetCircle extends IPlanet {
 export class PlanetCircle extends Planet implements IPlanetCircle {
   private color: string
   private size: number
-  private gradient?: string
   private _targetSize: number
+  private gradient?: string
   constructor({ color = '#fff', size = 0, gradient = null} = {}) {
     super()
     this.color = color
@@ -34,7 +41,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
       if (filter) {
         this.$group.attr('filter', filter)
       }
-      planetAnimator.execute(this, this.$group
+      planetSizeAnimator.execute(this, this.$group
         .append('circle')
         .attr('fill', () => {
           return requestGradient ? requestGradient(this.color, this.gradient) : this.color
@@ -48,18 +55,25 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     }
   }
 
-  public updatePosition(angle: number, x: number, y: number): void {
-    super.updatePosition(angle, x, y)
+  public updatePosition(r: number, center: number[]): void {
+    if (this._angleAnimation) {
+      planetAngleAnimator.execute(this, this.$group, 1000)
+      this._angleAnimation = false
+      this._angleAnimationEnd = false
+    } else if (this._angleAnimationEnd) {
+      this.angle = this._targetAngle
+    }
+    const [x, y] = getPlanetPosition(r, angleToRadian(this.angle), center)
     this.$group
       .select('circle')
-      .attr('cx', this.x)
-      .attr('cy', this.y)
+      .attr('cx', x)
+      .attr('cy', y)
       .attr('r', this.size)
   }
 
   public remove() {
     this._targetSize = 0
-    planetAnimator.execute(this, this.$group.select('circle'), 1000)
+    planetSizeAnimator.execute(this, this.$group.select('circle'), 1000)
   }
 
   public getSize(): number {

@@ -17,8 +17,8 @@ function getAngle(r1, r2) {
 }
 exports.getAngle = getAngle;
 function getPlanetPosition(radius, radian, center) {
-    let x = radius * Math.cos(radian);
-    let y = radius * Math.sin(radian);
+    const x = radius * Math.cos(radian);
+    const y = radius * Math.sin(radian);
     return [center[0] + x, center[1] + y];
 }
 exports.getPlanetPosition = getPlanetPosition;

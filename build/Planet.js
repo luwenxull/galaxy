@@ -7,11 +7,13 @@ class Planet {
             throw new Error('Do not call new Planet() directly!');
         }
         this.$group = null;
+        this.angle = null;
+        this._targetAngle = null;
+        this._angleAnimation = false;
+        this._angleAnimationEnd = true;
     }
     create(parent, filter, requestGradient) { }
-    updatePosition(angle, x, y) {
-        this.setAngle(angle);
-    }
+    updatePosition(r, center) { }
     remove() {
         if (!tool_1.isNullOrUndefined(this.$group)) {
             this.$group.remove();
@@ -22,6 +24,18 @@ class Planet {
     }
     setAngle(angle) {
         this.angle = angle;
+    }
+    getTargetAngle() {
+        return this._targetAngle;
+    }
+    setTargetAngle(angle) {
+        this._targetAngle = angle;
+    }
+    requesetAngleAnimation() {
+        this._angleAnimation = true;
+    }
+    cancelAngleAnimation() {
+        this._angleAnimationEnd = true;
     }
 }
 exports.Planet = Planet;

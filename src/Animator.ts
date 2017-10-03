@@ -7,10 +7,10 @@ type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
 transition(null)
 
-export let planetAnimator = {
+export let planetSizeAnimator = {
   execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
     node
-      .transition('smaller')
+      .transition('size')
       .duration(time)
       .attrTween('r', () => {
         const size = planet.getSize()
@@ -20,6 +20,28 @@ export let planetAnimator = {
           planet.setSize(resultSize)
           return resultSize + ''
         }
+      })
+  },
+}
+
+export let planetAngleAnimator = {
+  execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
+    node
+      .transition('angle')
+      .duration(time)
+      .attrTween('data-angle', () => {
+        const angle = planet.getAngle()
+        console.log(angle)
+        return t => {
+          const targetAngle = planet.getTargetAngle()
+          console.log(targetAngle)
+          const resultAngle = (targetAngle - angle) * t + angle
+          planet.setAngle(resultAngle)
+          return resultAngle + ''
+        }
+      })
+      .on('end', () => {
+        planet.cancelAngleAnimation()
       })
   },
 }

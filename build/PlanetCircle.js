@@ -17,7 +17,7 @@ class PlanetCircle extends Planet_1.Planet {
             if (filter) {
                 this.$group.attr('filter', filter);
             }
-            Animator_1.planetAnimator.execute(this, this.$group
+            Animator_1.planetSizeAnimator.execute(this, this.$group
                 .append('circle')
                 .attr('fill', () => {
                 return requestGradient ? requestGradient(this.color, this.gradient) : this.color;
@@ -30,13 +30,25 @@ class PlanetCircle extends Planet_1.Planet {
             }), 1000);
         }
     }
-    updatePosition(angle, x, y) {
-        super.updatePosition(angle, x, y);
+    updatePosition(r, center) {
+        if (this._angleAnimation) {
+            Animator_1.planetAngleAnimator.execute(this, this.$group, 1000);
+            this._angleAnimation = false;
+            this._angleAnimationEnd = false;
+        }
+        else if (this._angleAnimationEnd) {
+            this.angle = this._targetAngle;
+        }
+        const [x, y] = tool_1.getPlanetPosition(r, tool_1.angleToRadian(this.angle), center);
         this.$group
             .select('circle')
             .attr('cx', x)
             .attr('cy', y)
-            .attr('r', this.getSize());
+            .attr('r', this.size);
+    }
+    remove() {
+        this._targetSize = 0;
+        Animator_1.planetSizeAnimator.execute(this, this.$group.select('circle'), 1000);
     }
     getSize() {
         return this.size;

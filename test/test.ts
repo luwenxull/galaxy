@@ -1,5 +1,4 @@
 import { randomUniform } from 'd3-random'
-import { planetAnimator } from '../src/Animator'
 import { Galaxy, IGalaxy} from '../src/Galaxy'
 import { IOrbit, Orbit } from '../src/Orbit'
 import { IPlanetCircle, PlanetCircle } from '../src/PlanetCircle'
@@ -7,8 +6,8 @@ import { IPlanetCircle, PlanetCircle } from '../src/PlanetCircle'
 const galaxy: IGalaxy = new Galaxy()
 const sizeR = randomUniform(10, 20)
 const positionR = randomUniform(0, 360)
-const speedR = randomUniform(0.1, 0.2)
-const orbitNum = 5
+const speedR = randomUniform(0.1, 0.5)
+const orbitNum = 1
 const orbits: IOrbit[] = []
 for (let i = 0; i < orbitNum; i++) {
   const orbit = new Orbit(speedR())
@@ -21,16 +20,19 @@ for (let i = 0; i < orbitNum; i++) {
   )
   orbits.push(orbit)
 }
-function newPlanet() {
+function newPlanet(num: number = 1) {
   const randomIndex = Math.floor(randomUniform(0, orbits.length)())
   const orbit = orbits[randomIndex]
-  orbit.addPlanet(
-    new PlanetCircle({
-      color: 'orange',
-      gradient: 'orange',
-      size: sizeR(),
-    }),
-  )
+  while (num > 0) {
+    orbit.addPlanet(
+      new PlanetCircle({
+        color: 'orange',
+        gradient: 'orange',
+        size: sizeR(),
+      }),
+    )
+    num -= 1
+  }
 }
 
 function removePlanet(): void {
