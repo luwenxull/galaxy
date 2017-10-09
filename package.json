@@ -5,12 +5,14 @@
   "author": "luwenxull <992273307@qq.com>",
   "license": "MIT",
   "scripts": {
-    "build": "./node_modules/.bin/webpack --progress --profile --colors",
-    "build:ts": "./node_modules/.bin/tsc",
+    "build": "npm run tsc && npm run eslint:fix",
+    "tsc": "./node_modules/.bin/tsc",
     "watch": "./node_modules/.bin/webpack --progress --profile --colors -w",
     "start": "./node_modules/.bin/webpack-dev-server --open",
-    "lint": "./node_modules/.bin/tslint ./src",
-    "lint:fix": "./node_modules/.bin/tslint --fix ./src"
+    "tslint": "./node_modules/.bin/tslint ./src",
+    "tslint:fix": "./node_modules/.bin/tslint --fix ./src",
+    "eslint": "./node_modules/.bin/eslint --color ./build",
+    "eslint:fix": "./node_modules/.bin/eslint --fix ./build"
   },
   "dependencies": {
     "best-candidate": "^1.0.3"

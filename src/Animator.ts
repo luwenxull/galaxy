@@ -31,10 +31,8 @@ export let planetAngleAnimator = {
       .duration(time)
       .attrTween('data-angle', () => {
         const angle = planet.getAngle()
-        console.log(angle)
         return t => {
           const targetAngle = planet.getTargetAngle()
-          console.log(targetAngle)
           const resultAngle = (targetAngle - angle) * t + angle
           planet.setAngle(resultAngle)
           return resultAngle + ''

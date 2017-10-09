@@ -25,7 +25,6 @@ function dynamicDistributeAngle(planets: IPlanet[], radius: number, lastLength: 
   const randomAngle = randomUniform(0, 360)
   const len = planets.length
   const angleUnit = 360 / len
-  const ifSomeNew = someNew(planets)
   if (lastLength !== len || someNew(planets)) {
     for (let i = 0; i < planets.length; i++) {
       const planet = planets[i]
