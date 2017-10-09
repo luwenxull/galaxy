@@ -77,7 +77,7 @@ export class Galaxy {
     this.$stars.defs = this.$stars.svg.append('defs');
     this.$stars.rootGroup = this.$stars.svg.append('g');
     const filter = this.$stars.defs.append('filter').attr('id', 'star-gaussian-blur');
-    merge(gaussianBlur(filter, void 0, 'blur', 3), ['blur', 'SourceGraphic']);
+    merge(gaussianBlur(filter, undefined, 'blur', 3), ['blur', 'SourceGraphic']);
   }
   initOrbitsDom(container, width, height) {
     this.$orbits.container = select(container)
@@ -92,7 +92,7 @@ export class Galaxy {
     this.$orbits.defs = this.$orbits.svg.append('defs');
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`);
     const filter = this.$orbits.defs.append('filter').attr('id', 'planet-gaussian-blur');
-    merge(gaussianBlur(filter, void 0, 'blur', 3), ['blur', 'SourceGraphic']);
+    merge(gaussianBlur(filter, undefined, 'blur', 3), ['blur', 'SourceGraphic']);
   }
   drawStars(width, height, count = 500) {
     const r = Math.sqrt(width * width + height * height);

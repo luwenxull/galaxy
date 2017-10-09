@@ -78,7 +78,6 @@ export class Orbit implements IOrbit {
   private $group: selectionGenerics
   private $orbitSelf: selectionGenerics
   private _needInit: boolean
-  private _forceUpdate: boolean
   private _targetRadius: number
   private _removed: boolean
   private _lastLength: number
@@ -93,7 +92,6 @@ export class Orbit implements IOrbit {
     this.$group = null
     this.$orbitSelf = null
     this._needInit = true
-    this._forceUpdate = false
     this._targetRadius = null
     this._removed = false
     this._lastLength = null
@@ -179,11 +177,9 @@ export class Orbit implements IOrbit {
 
   private drawOrbit(renderOrbit: boolean, orbitColor: string) {
     if (!isNullOrUndefined(this.$orbitSelf)) {
-      this._forceUpdate = true
       orbitAnimator.execute(this, this.$orbitSelf, 1000, () => {
         // When the transition subsequently starts,
         // it interrupts the active transition of the same name on the same element
-        this._forceUpdate = false
       })
     } else {
       this.$orbitSelf = this.$group.append('circle')

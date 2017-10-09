@@ -1,6 +1,6 @@
 import { transition } from 'd3-transition'; // eslint-disable-line no-unused-vars
 transition(null);
-export let planetSizeAnimator = {
+export const planetSizeAnimator = {
   execute(planet, node, time) {
     node
       .transition('size')
@@ -16,7 +16,7 @@ export let planetSizeAnimator = {
       });
   },
 };
-export let planetAngleAnimator = {
+export const planetAngleAnimator = {
   execute(planet, node, time) {
     node
       .transition('angle')
@@ -35,7 +35,7 @@ export let planetAngleAnimator = {
       });
   },
 };
-export let orbitAnimator = {
+export const orbitAnimator = {
   execute(orbitInstance, node, duration, endCallback) {
     node
       .transition('orbit-transition')

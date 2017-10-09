@@ -109,7 +109,7 @@ export class Galaxy implements IGalaxy {
     this.$stars.defs = this.$stars.svg.append('defs')
     this.$stars.rootGroup = this.$stars.svg.append('g')
     const filter = this.$stars.defs.append('filter').attr('id', 'star-gaussian-blur')
-    merge(gaussianBlur(filter, void 0, 'blur', 3), ['blur', 'SourceGraphic'])
+    merge(gaussianBlur(filter, undefined, 'blur', 3), ['blur', 'SourceGraphic'])
   }
 
   private initOrbitsDom(container: HTMLElement, width: number, height: number) {
@@ -125,7 +125,7 @@ export class Galaxy implements IGalaxy {
     this.$orbits.defs = this.$orbits.svg.append('defs')
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
     const filter = this.$orbits.defs.append('filter').attr('id', 'planet-gaussian-blur')
-    merge(gaussianBlur(filter, void 0, 'blur', 3), ['blur', 'SourceGraphic'])
+    merge(gaussianBlur(filter, undefined, 'blur', 3), ['blur', 'SourceGraphic'])
   }
 
   private drawStars(width: number, height: number, count: number = 500) {

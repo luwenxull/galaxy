@@ -7,7 +7,7 @@ type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
 transition(null)
 
-export let planetSizeAnimator = {
+export const planetSizeAnimator = {
   execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
     node
       .transition('size')
@@ -24,7 +24,7 @@ export let planetSizeAnimator = {
   },
 }
 
-export let planetAngleAnimator = {
+export const planetAngleAnimator = {
   execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
     node
       .transition('angle')
@@ -44,7 +44,7 @@ export let planetAngleAnimator = {
   },
 }
 
-export let orbitAnimator = {
+export const orbitAnimator = {
   execute(orbitInstance: IOrbit, node: selectionGenerics, duration: number, endCallback) {
     node
       .transition('orbit-transition')
