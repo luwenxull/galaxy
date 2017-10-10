@@ -50,10 +50,12 @@ doRender()
 declare global {
   // tslint:disable-next-line:interface-name
   interface Window {
+    _galaxy
     _render()
     _update()
   }
 }
 
+window._galaxy = galaxy
 window._render = doRender
 window._update = doUpdate

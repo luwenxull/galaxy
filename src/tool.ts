@@ -21,3 +21,11 @@ export function getPlanetPosition(radius: number, radian: number, center: number
   const y = radius * Math.sin(radian)
   return [center[0] + x, center[1] + y]
 }
+
+export function isArray<T>(val: T): boolean {
+  return val instanceof Array
+}
+
+export function toArray(val: any): any[] {
+  return [].concat(val)
+}

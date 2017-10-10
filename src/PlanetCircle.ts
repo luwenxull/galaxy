@@ -2,6 +2,7 @@ import {
   planetAngleAnimator,
   planetSizeAnimator,
 } from './Animator'
+import { Hinter, IHinter } from './Hinter'
 import { IPlanet, Planet } from './Planet'
 import {
   angleToRadian,
@@ -11,6 +12,8 @@ import {
 } from './tool'
 
 export interface IPlanetCircle extends IPlanet {
+  putOnCap(): void
+  takeOffCap(): void
   getSize(): number
   setSize(size: number): void
   getTargetSize(): number
@@ -27,6 +30,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   private requestGradient: (baseColor: string, id: string) => string
   private _sizeAnimationEnd: boolean
   private _sizeAnimationCallback: () => void
+  private hinter: IHinter
   constructor({ color = '#fff', size = 0, gradient = null} = {}) {
     super()
     this.color = color
@@ -35,6 +39,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     this._targetSize = size
     this._sizeAnimationEnd = true
     this._sizeAnimationCallback = null
+    this.hinter = null
   }
 
   public propertyToBeClone() {
@@ -63,6 +68,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
         .on('mouseleave', () => {
           // this.run()
         })
+      this.hinter = new Hinter(this.$group.append('g').attr('data-name', 'planet-cap'))
     }
   }
 
@@ -106,5 +112,13 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
 
   public setTargetSize(size: number) {
     this._targetSize = size
+  }
+
+  public putOnCap(): void {
+    this.hinter.show('good')
+  }
+
+  public takeOffCap(): void {
+    this.hinter.close()
   }
 }
