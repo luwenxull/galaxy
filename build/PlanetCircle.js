@@ -8,24 +8,30 @@ export class PlanetCircle extends Planet {
     this.gradient = gradient;
     this.size = 0;
     this._targetSize = size;
+    this._sizeAnimationEnd = true;
+    this._sizeAnimationCallback = null;
+  }
+  propertyToBeClone() {
+    return Object.assign({
+      $circle: this.$circle,
+      size: this.size,
+    }, super.propertyToBeClone());
   }
   create(parent, filter, requestGradient) {
+    this.requestGradient = requestGradient;
     if (isNullOrUndefined(this.$group)) {
       this.$group = parent.append('g').attr('data-name', 'planet-group');
       if (filter) {
         this.$group.attr('filter', filter);
       }
-      planetSizeAnimator.execute(this, this.$group
+      this.$circle = this.$group
         .append('circle')
-        .attr('fill', () => {
-          return requestGradient ? requestGradient(this.color, this.gradient) : this.color;
-        })
         .on('mousemove', () => {
           // this.stop()
         })
         .on('mouseleave', () => {
           // this.run()
-        }), 1000);
+        });
     }
   }
   updatePosition(r, center) {
@@ -36,16 +42,22 @@ export class PlanetCircle extends Planet {
     } else if (this._angleAnimationEnd) {
       this.angle = this._targetAngle;
     }
+    if (this.size !== this._targetSize && this._sizeAnimationEnd) {
+      this._sizeAnimationEnd = false;
+      planetSizeAnimator.execute(this, this.$circle, 1000, () => {
+        this._sizeAnimationEnd = true;
+        this._sizeAnimationCallback && this._sizeAnimationCallback();
+      });
+    }
     const [x, y] = getPlanetPosition(r, angleToRadian(this.angle), center);
     this.$group
       .select('circle')
       .attr('cx', x)
       .attr('cy', y)
-      .attr('r', this.size);
-  }
-  remove() {
-    this._targetSize = 0;
-    planetSizeAnimator.execute(this, this.$group.select('circle'), 1000);
+      .attr('r', this.size)
+      .attr('fill', () => {
+        return this.requestGradient ? this.requestGradient(this.color, this.gradient) : this.color;
+      });
   }
   getSize() {
     return this.size;

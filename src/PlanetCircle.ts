@@ -37,6 +37,13 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     this._sizeAnimationCallback = null
   }
 
+  public propertyToBeClone() {
+    return Object.assign({
+      $circle: this.$circle,
+      size: this.size,
+    }, super.propertyToBeClone())
+  }
+
   public create(
     parent: selectionGenerics,
     filter: string,

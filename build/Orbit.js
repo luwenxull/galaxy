@@ -1,6 +1,6 @@
 import { randomUniform } from 'd3-random';
 import { orbitAnimator } from './Animator';
-import { isNullOrUndefined } from './tool';
+import { getAngle, isNullOrUndefined } from './tool';
 function someNew(planets) {
   for (let i = 0; i < planets.length; i++) {
     if (isNullOrUndefined(planets[i].getTargetAngle())) {
@@ -15,7 +15,7 @@ function dynamicDistributeAngle(planets, radius, lastLength) {
   const len = planets.length;
   const angleUnit = 360 / len;
   if (lastLength !== len || someNew(planets)) {
-    for (let i = 0; i < planets.length; i++) {
+    for (let i = 0; i < len; i++) {
       const planet = planets[i];
       if (i === 0) {
         if (!isNullOrUndefined(planet.getAngle())) {
@@ -24,8 +24,8 @@ function dynamicDistributeAngle(planets, radius, lastLength) {
           startAngle = randomAngle();
         }
       }
-      const positionIndex = len === 1 ? i : (i + 1);
-      planet.setTargetAngle(startAngle + angleUnit * positionIndex);
+      // const positionIndex = len === 1 ? i : (i + 1)
+      planet.setTargetAngle(startAngle + angleUnit * i);
       if (!isNullOrUndefined(planet.getAngle())) {
         planet.requesetAngleAnimation();
       }
@@ -40,19 +40,28 @@ export class Orbit {
     this.angle = 0;
     this.planets = [];
     this.animationFrame = null;
-    this.reservedAngle = [];
     this.$group = null;
     this.$orbitSelf = null;
     this._needInit = true;
     this._targetRadius = null;
-    this._removed = false;
     this._lastLength = null;
+  }
+  propertyToBeClone() {
+    return {
+      $group: this.$group,
+      $orbitSelf: this.$orbitSelf,
+      _needInit: this._needInit,
+      radius: this.radius,
+      speed: this.speed,
+    };
   }
   addPlanet(planet) {
     this.planets.push(planet);
   }
   run(place, { renderOrbit = false, orbitColor = '#fff', planetFilter = null, requestGradient = null } = {}) {
-    dynamicDistributeAngle(this.planets, this.radius, this._lastLength);
+    const max = Math.floor(360 / getAngle(20, this._targetRadius));
+    this.planets = this.planets.slice(0, max);
+    dynamicDistributeAngle(this.planets, this._targetRadius, this._lastLength);
     this._lastLength = this.planets.length;
     if (this._needInit) {
       this.$group = place.append('g').attr('data-name', 'orbit-group');
@@ -61,10 +70,8 @@ export class Orbit {
     this.drawOrbit(renderOrbit, orbitColor);
     for (const planet of this.planets) {
       planet.create(this.$group, planetFilter, requestGradient);
-      // updatePositionOfPlanet(planet, this.getRadius(), this.center)
     }
     const run = () => {
-      // this.update()
       for (const planet of this.planets) {
         planet.setTargetAngle(this.speed + planet.getTargetAngle());
         planet.updatePosition(this.radius, this.center);
@@ -75,9 +82,8 @@ export class Orbit {
     this.animationFrame = requestAnimationFrame(run);
   }
   reset() {
-    this._needInit = true;
     this.$group = null;
-    this.animationFrame !== null && cancelAnimationFrame(this.animationFrame);
+    !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame);
   }
   remove() {
     if (!isNullOrUndefined(this.$group)) {
@@ -85,15 +91,6 @@ export class Orbit {
     }
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame);
-    }
-    this._removed = true;
-  }
-  removePlanet(planetNeedRemove) {
-    for (let i = 0; i < this.planets.length; i += 1) {
-      if (planetNeedRemove === this.planets[i]) {
-        planetNeedRemove.remove();
-        this.planets.splice(i, 1);
-      }
     }
   }
   setRadius(radius) {

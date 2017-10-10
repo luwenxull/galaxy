@@ -1,7 +1,7 @@
 import { transition } from 'd3-transition'; // eslint-disable-line no-unused-vars
 transition(null);
 export const planetSizeAnimator = {
-  execute(planet, node, time) {
+  execute(planet, node, time, endCallback) {
     node
       .transition('size')
       .duration(time)
@@ -13,6 +13,9 @@ export const planetSizeAnimator = {
           planet.setSize(resultSize);
           return resultSize + '';
         };
+      })
+      .on('end', () => {
+        endCallback && endCallback();
       });
   },
 };

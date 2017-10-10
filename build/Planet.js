@@ -1,14 +1,21 @@
 import { isNullOrUndefined } from './tool';
 export class Planet {
   constructor() {
-    if (new.target.name === 'Planet') {
-      throw new Error('Do not call new Planet() directly!');
-    }
+    /* if (new.target.name === 'Planet') {
+          throw new Error('Do not call new Planet() directly!')
+        } */
     this.$group = null;
     this.angle = null;
     this._targetAngle = null;
     this._angleAnimation = false;
     this._angleAnimationEnd = true;
+  }
+  propertyToBeClone() {
+    return {
+      $group: this.$group,
+      _targetAngle: this._targetAngle,
+      angle: this.angle,
+    };
   }
   create(parent, filter, requestGradient) { }
   updatePosition(r, center) { }

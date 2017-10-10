@@ -9,35 +9,23 @@ import {
   selectionGenerics,
 } from './tool'
 
-function someNew(planets: IPlanet[]): {
-  planets: IPlanet[],
-  ifSomeNew: boolean,
-} {
-  const existPlanets: IPlanet[] = []
-  let ifSomeNew: boolean = false
+function someNew(planets: IPlanet[]): boolean {
   for (let i = 0; i < planets.length; i++) {
-    if (!planets[i].needRemove) {
-      existPlanets.push(planets[i])
-      if (isNullOrUndefined(planets[i].getTargetAngle())) {
-        ifSomeNew = true
-      }
+    if (isNullOrUndefined(planets[i].getTargetAngle())) {
+      return true
     }
   }
-  return {
-    ifSomeNew,
-    planets: existPlanets,
-  }
+  return false
 }
 
 function dynamicDistributeAngle(
-  planets: IPlanet[], radius: number, lastLength: number, ifSomeNew: boolean,
+  planets: IPlanet[], radius: number, lastLength: number,
 ): void {
   let startAngle: number = null
   const randomAngle = randomUniform(0, 360)
   const len = planets.length
   const angleUnit = 360 / len
-  const max = Math.floor(360 / getAngle(20, radius))
-  if (lastLength !== len || ifSomeNew) {
+  if (lastLength !== len || someNew(planets)) {
     for (let i = 0; i < len; i++) {
       const planet = planets[i]
       if (i === 0) {
@@ -47,8 +35,8 @@ function dynamicDistributeAngle(
           startAngle = randomAngle()
         }
       }
-      const positionIndex = len === 1 ? i : (i + 1)
-      planet.setTargetAngle(startAngle + angleUnit * positionIndex)
+      // const positionIndex = len === 1 ? i : (i + 1)
+      planet.setTargetAngle(startAngle + angleUnit * i)
       if (!isNullOrUndefined(planet.getAngle())) {
         planet.requesetAngleAnimation()
       }
@@ -62,10 +50,11 @@ export interface IOrbit {
   speed: number
   angle: number
   planets: IPlanet[]
+  propertyToBeClone(): object
   addPlanet(planet: IPlanet): void
   run(place: selectionGenerics, config?: object): void
   remove(): void
-  removePlanet(planet: IPlanet): void
+  reset(): void
   getRadius(): number
   setRadius(radius: number): void
   getTargetRadius(): number
@@ -79,12 +68,10 @@ export class Orbit implements IOrbit {
   public angle: number
   public planets: IPlanet[]
   private animationFrame: any
-  private reservedAngle: number[]
   private $group: selectionGenerics
   private $orbitSelf: selectionGenerics
   private _needInit: boolean
   private _targetRadius: number
-  private _removed: boolean
   private _lastLength: number
   constructor(speed: number, center = [0, 0]) {
     this.radius = null
@@ -93,13 +80,21 @@ export class Orbit implements IOrbit {
     this.angle = 0
     this.planets = []
     this.animationFrame = null
-    this.reservedAngle = []
     this.$group = null
     this.$orbitSelf = null
     this._needInit = true
     this._targetRadius = null
-    this._removed = false
     this._lastLength = null
+  }
+
+  public propertyToBeClone() {
+    return {
+      $group: this.$group,
+      $orbitSelf: this.$orbitSelf,
+      _needInit: this._needInit,
+      radius: this.radius,
+      speed: this.speed,
+    }
   }
 
   public addPlanet(planet: IPlanet) {
@@ -115,9 +110,9 @@ export class Orbit implements IOrbit {
       requestGradient = null,
     } = {},
   ) {
-    const { ifSomeNew, planets } = someNew(this.planets)
-    this.planets = planets
-    dynamicDistributeAngle(this.planets, this._targetRadius, this._lastLength, ifSomeNew)
+    const max = Math.floor(360 / getAngle(20, this._targetRadius))
+    this.planets = this.planets.slice(0, max)
+    dynamicDistributeAngle(this.planets, this._targetRadius, this._lastLength)
     this._lastLength = this.planets.length
     if (this._needInit) {
       this.$group = place.append('g').attr('data-name', 'orbit-group')
@@ -126,10 +121,8 @@ export class Orbit implements IOrbit {
     this.drawOrbit(renderOrbit, orbitColor)
     for (const planet of this.planets) {
       planet.create(this.$group, planetFilter, requestGradient)
-      // updatePositionOfPlanet(planet, this.getRadius(), this.center)
     }
     const run = () => {
-      // this.update()
       for (const planet of this.planets) {
         planet.setTargetAngle(this.speed + planet.getTargetAngle())
         planet.updatePosition(this.radius, this.center)
@@ -141,9 +134,8 @@ export class Orbit implements IOrbit {
   }
 
   public reset() {
-    this._needInit = true
     this.$group = null
-    this.animationFrame !== null && cancelAnimationFrame(this.animationFrame)
+    !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame)
   }
 
   public remove() {
@@ -152,17 +144,6 @@ export class Orbit implements IOrbit {
     }
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame)
-    }
-    this._removed = true
-  }
-
-  public removePlanet(planetNeedRemove: IPlanet) {
-    for (let i = 0; i < this.planets.length; i += 1) {
-      if (planetNeedRemove === this.planets[i]) {
-        planetNeedRemove.remove(() => {
-          // this.planets.splice(i, 1)
-        })
-      }
     }
   }
 

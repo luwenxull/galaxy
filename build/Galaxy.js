@@ -2,8 +2,9 @@ import Quadtree from 'best-candidate';
 import { randomUniform } from 'd3-random';
 import { select } from 'd3-selection';
 import { gaussianBlur, merge } from './Filter';
-import { stereoscopicStop } from './Gradient';
+import { requestGradient } from './Gradient';
 import { Star } from './Star';
+import { isNullOrUndefined } from './tool';
 const randomStep = randomUniform(0.01, 0.02);
 const defaultProp = {
   container: null,
@@ -13,7 +14,6 @@ const defaultProp = {
   rootGroup: null,
   svg: null,
 };
-const gradientMap = new Map();
 function dynamicDistributeOrbit(orbits, width, height) {
   const maxRadius = Math.min(width, height) / 2;
   // orbits = orbits.filter(orbit => !orbit.removed)
@@ -25,6 +25,37 @@ function dynamicDistributeOrbit(orbits, width, height) {
     orbit.setTargetRadius(targetRadius);
   }
   return orbits;
+}
+function takeFromCachePlanets(newPlanets, cachePlanets) {
+  const nl = newPlanets.length;
+  const cl = cachePlanets.length;
+  for (let i = 0; i < nl; i++) {
+    if (!isNullOrUndefined(cachePlanets[i])) {
+      Object.assign(newPlanets[i], cachePlanets[i].propertyToBeClone());
+    }
+  }
+  if (nl < cl) {
+    for (let j = nl; j < cl; j++) {
+      cachePlanets[j].remove();
+    }
+  }
+}
+function takeFromCacheOrbits(newOrbits, cacheOrbits) {
+  const nl = newOrbits.length;
+  const cl = cacheOrbits.length;
+  for (let i = 0; i < nl; i++) {
+    if (!isNullOrUndefined(cacheOrbits[i])) {
+      Object.assign(newOrbits[i], cacheOrbits[i].propertyToBeClone());
+      cacheOrbits[i].reset();
+      takeFromCachePlanets(newOrbits[i].planets, cacheOrbits[i].planets);
+    }
+  }
+  if (nl < cl) {
+    for (let j = nl; j < cl; j++) {
+      cacheOrbits[j].remove();
+      cacheOrbits[j].reset();
+    }
+  }
 }
 export class Galaxy {
   constructor() {
@@ -47,10 +78,11 @@ export class Galaxy {
     }, defaultProp);
     this.instanceOrbits = null;
     this.$container = null;
-    this.requestGradient = this.requestGradient.bind(this);
+    this._cacheOrbits = null;
   }
   render(container, orbits) {
     this.$container = container;
+    this._cacheOrbits = orbits;
     container.textContent = '';
     const { width, height } = container.getBoundingClientRect();
     this.initStarsDom(container, width, height);
@@ -60,6 +92,8 @@ export class Galaxy {
   }
   update(orbits, callback) {
     const { width, height } = this.$container.getBoundingClientRect();
+    takeFromCacheOrbits(orbits, this._cacheOrbits);
+    this._cacheOrbits = orbits;
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height));
     callback && callback(this.instanceOrbits);
   }
@@ -113,15 +147,6 @@ export class Galaxy {
     this.$orbits.rootGroup.remove();
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`);
   }
-  requestGradient(baseColor, id) {
-    if (gradientMap.has(id)) {
-      return 'url(#' + id + ')';
-    } else {
-      stereoscopicStop(this.$orbits.defs.append('radialGradient'), baseColor).attr('id', id);
-      gradientMap.set(id, true);
-      return 'url(#' + id + ')';
-    }
-  }
   drawOrbits(orbits) {
     this.instanceOrbits = orbits;
     for (const orbit of orbits) {
@@ -130,7 +155,7 @@ export class Galaxy {
         orbitColor: '#123456',
         planetFilter: 'url(#planet-gaussian-blur)',
         renderOrbit: true,
-        requestGradient: this.requestGradient,
+        requestGradient: requestGradient(this.$orbits.defs),
       });
     }
   }

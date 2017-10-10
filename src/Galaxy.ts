@@ -4,8 +4,9 @@ import { select } from 'd3-selection'
 import { gaussianBlur, merge } from './Filter'
 import { requestGradient } from './Gradient'
 import { IOrbit } from './Orbit'
-import { IStar, Star} from './Star'
-import { selectionGenerics } from './tool'
+import { IPlanet } from './Planet'
+import { IStar, Star } from './Star'
+import { isNullOrUndefined, selectionGenerics } from './tool'
 
 interface IDefaultProp {
   container: selectionGenerics
@@ -25,7 +26,6 @@ const defaultProp: IDefaultProp = {
   rootGroup: null,
   svg: null,
 }
-const gradientMap = new Map()
 function dynamicDistributeOrbit(orbits: IOrbit[], width: number, height: number) {
   const maxRadius = Math.min(width, height) / 2
   // orbits = orbits.filter(orbit => !orbit.removed)
@@ -37,6 +37,39 @@ function dynamicDistributeOrbit(orbits: IOrbit[], width: number, height: number)
     orbit.setTargetRadius(targetRadius)
   }
   return orbits
+}
+
+function takeFromCachePlanets(newPlanets: IPlanet[], cachePlanets: IPlanet[]) {
+  const nl = newPlanets.length
+  const cl = cachePlanets.length
+  for (let i = 0; i < nl; i++) {
+    if (!isNullOrUndefined(cachePlanets[i])) {
+      Object.assign(newPlanets[i], cachePlanets[i].propertyToBeClone())
+    }
+  }
+  if (nl < cl) {
+    for (let j = nl; j < cl; j++) {
+      cachePlanets[j].remove()
+    }
+  }
+}
+
+function takeFromCacheOrbits(newOrbits: IOrbit[], cacheOrbits: IOrbit[]) {
+  const nl = newOrbits.length
+  const cl = cacheOrbits.length
+  for (let i = 0; i < nl; i++) {
+    if (!isNullOrUndefined(cacheOrbits[i])) {
+      Object.assign(newOrbits[i], cacheOrbits[i].propertyToBeClone())
+      cacheOrbits[i].reset()
+      takeFromCachePlanets(newOrbits[i].planets, cacheOrbits[i].planets)
+    }
+  }
+  if (nl < cl) {
+    for (let j = nl; j < cl; j++) {
+      cacheOrbits[j].remove()
+      cacheOrbits[j].reset()
+    }
+  }
 }
 
 export interface IGalaxy {
@@ -55,6 +88,7 @@ export class Galaxy implements IGalaxy {
   private $orbits: IDefaultProp & {
     style: object,
   }
+  private _cacheOrbits: IOrbit[]
   constructor() {
     this.$stars = Object.assign({
       style: {
@@ -75,10 +109,12 @@ export class Galaxy implements IGalaxy {
     }, defaultProp)
     this.instanceOrbits = null
     this.$container = null
+    this._cacheOrbits = null
   }
 
   public render(container: HTMLElement, orbits: IOrbit[]) {
     this.$container = container
+    this._cacheOrbits = orbits
     container.textContent = ''
     const { width, height } = container.getBoundingClientRect()
     this.initStarsDom(container, width, height)
@@ -89,6 +125,8 @@ export class Galaxy implements IGalaxy {
 
   public update(orbits: IOrbit[], callback?: (orbits: IOrbit[]) => void) {
     const { width, height } = this.$container.getBoundingClientRect()
+    takeFromCacheOrbits(orbits, this._cacheOrbits)
+    this._cacheOrbits = orbits
     this.drawOrbits(dynamicDistributeOrbit(orbits, width, height))
     callback && callback(this.instanceOrbits)
   }

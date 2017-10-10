@@ -2,14 +2,14 @@ import { BaseType, Selection } from 'd3-selection'
 import { isNullOrUndefined, selectionGenerics } from './tool'
 
 export interface IPlanet {
-  needRemove: boolean
+  propertyToBeClone(): object
   create(
     parent: selectionGenerics,
     filter: string,
-    requestGradient: (baseColor: string, id: string) => string
+    requestGradient: (baseColor: string, id: string) => string,
   ): void
   updatePosition(radius: number, center: number[]): void
-  remove(callback: () => void): void
+  remove(): void
   getAngle(): number
   setAngle(angle: number): void
   getTargetAngle(): number
@@ -26,15 +26,22 @@ export class Planet implements IPlanet {
   protected _angleAnimation: boolean
   protected _angleAnimationEnd: boolean
   constructor() {
-    if (new.target.name === 'Planet') {
+    /* if (new.target.name === 'Planet') {
       throw new Error('Do not call new Planet() directly!')
-    }
-    this.needRemove = false
+    } */
     this.$group = null
     this.angle = null
     this._targetAngle = null
     this._angleAnimation = false
     this._angleAnimationEnd = true
+  }
+
+  public propertyToBeClone() {
+    return {
+      $group: this.$group,
+      _targetAngle: this._targetAngle,
+      angle: this.angle,
+    }
   }
 
   public create(
@@ -44,12 +51,10 @@ export class Planet implements IPlanet {
 
   public updatePosition(r: number, center: number[]) {}
 
-  public remove(callback: () => void) {
-    this.needRemove = true
+  public remove() {
     if (!isNullOrUndefined(this.$group)) {
       this.$group.remove()
     }
-    callback()
   }
 
   public getAngle() {
