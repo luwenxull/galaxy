@@ -22,6 +22,8 @@ export class Planet implements IPlanet {
   public needRemove: boolean
   protected $group: selectionGenerics
   protected angle: number
+  protected x: number
+  protected y: number
   protected _targetAngle: number
   protected _angleAnimation: boolean
   protected _angleAnimationEnd: boolean
@@ -31,6 +33,8 @@ export class Planet implements IPlanet {
     } */
     this.$group = null
     this.angle = null
+    this.x = null
+    this.y = null
     this._targetAngle = null
     this._angleAnimation = false
     this._angleAnimationEnd = true

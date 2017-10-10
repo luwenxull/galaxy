@@ -15,7 +15,8 @@
     "eslint:fix": "./node_modules/.bin/eslint --fix ./build"
   },
   "dependencies": {
-    "best-candidate": "^1.0.3"
+    "best-candidate": "^1.0.3",
+    "d3": "^4.11.0"
   },
   "devDependencies": {
     "@types/d3": "^4.10.1",

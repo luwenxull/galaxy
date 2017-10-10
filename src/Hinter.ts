@@ -1,6 +1,6 @@
 import { selectionGenerics, toArray } from './tool'
 export interface IHinter {
-  show(text: string | string[]): void
+  show(text: string | string[], center: number[]): void
   close(): void
 }
 
@@ -14,7 +14,10 @@ export class Hinter implements IHinter {
     this.$text = this.$group.append('text')
   }
 
-  public show(text: string | string[]) {
+  public show(text: string | string[], center: number[]) {
+    this.$group.attr('transform', `translate(${center[0]},${center[1]})`)
+    this.$rect
+      .attr('')
     this.$text
       .selectAll('tspan')
       .data(toArray(text))

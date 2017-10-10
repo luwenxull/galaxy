@@ -88,6 +88,8 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
       })
     }
     const [x, y] = getPlanetPosition(r, angleToRadian(this.angle), center)
+    this.x = x
+    this.y = y
     this.$group
       .select('circle')
       .attr('cx', x)
@@ -115,7 +117,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   }
 
   public putOnCap(): void {
-    this.hinter.show('good')
+    this.hinter.show('good', [this.x, this.y])
   }
 
   public takeOffCap(): void {
