@@ -1,8 +1,7 @@
 import { interpolateRgb } from 'd3-interpolate'
 import { select } from 'd3-selection'
 import { BaseType, Selection } from 'd3-selection'
-import { isNullOrUndefined } from './tool'
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
+import { isNullOrUndefined, selectionGenerics} from './tool'
 export interface IStar {
   center: number[]
   radius: number

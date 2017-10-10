@@ -1,14 +1,11 @@
-import { BaseType, Selection } from 'd3-selection'
 import { transition } from 'd3-transition' // eslint-disable-line no-unused-vars
 import { IOrbit } from './Orbit'
 import { IPlanetCircle } from './PlanetCircle'
-
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
-
+import { selectionGenerics } from './tool'
 transition(null)
 
 export const planetSizeAnimator = {
-  execute(planet: IPlanetCircle, node: selectionGenerics, time: number) {
+  execute(planet: IPlanetCircle, node: selectionGenerics, time: number, endCallback?) {
     node
       .transition('size')
       .duration(time)
@@ -20,6 +17,9 @@ export const planetSizeAnimator = {
           planet.setSize(resultSize)
           return resultSize + ''
         }
+      })
+      .on('end', () => {
+        endCallback && endCallback()
       })
   },
 }

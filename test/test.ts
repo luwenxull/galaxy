@@ -103,5 +103,6 @@ window._removeOrbit = function() {
 }
 window._removePlanet = function() {
   removePlanet()
+  newPlanet()
   doUpdate()
 }

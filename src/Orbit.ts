@@ -1,5 +1,4 @@
 import { randomUniform } from 'd3-random'
-import { BaseType, Selection } from 'd3-selection'
 import { orbitAnimator } from './Animator'
 import { IPlanet } from './Planet'
 import { IPlanetCircle, PlanetCircle } from './PlanetCircle'
@@ -7,26 +6,39 @@ import {
   getAngle,
   getPlanetPosition,
   isNullOrUndefined,
+  selectionGenerics,
 } from './tool'
 
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
-
-function someNew(planets: IPlanet[]): boolean {
+function someNew(planets: IPlanet[]): {
+  planets: IPlanet[],
+  ifSomeNew: boolean,
+} {
+  const existPlanets: IPlanet[] = []
+  let ifSomeNew: boolean = false
   for (let i = 0; i < planets.length; i++) {
-    if (isNullOrUndefined(planets[i].getTargetAngle())) {
-      return true
+    if (!planets[i].needRemove) {
+      existPlanets.push(planets[i])
+      if (isNullOrUndefined(planets[i].getTargetAngle())) {
+        ifSomeNew = true
+      }
     }
   }
-  return false
+  return {
+    ifSomeNew,
+    planets: existPlanets,
+  }
 }
 
-function dynamicDistributeAngle(planets: IPlanet[], radius: number, lastLength: number): void {
+function dynamicDistributeAngle(
+  planets: IPlanet[], radius: number, lastLength: number, ifSomeNew: boolean,
+): void {
   let startAngle: number = null
   const randomAngle = randomUniform(0, 360)
   const len = planets.length
   const angleUnit = 360 / len
-  if (lastLength !== len || someNew(planets)) {
-    for (let i = 0; i < planets.length; i++) {
+  const max = Math.floor(360 / getAngle(20, radius))
+  if (lastLength !== len || ifSomeNew) {
+    for (let i = 0; i < len; i++) {
       const planet = planets[i]
       if (i === 0) {
         if (!isNullOrUndefined(planet.getAngle())) {
@@ -43,13 +55,6 @@ function dynamicDistributeAngle(planets: IPlanet[], radius: number, lastLength: 
     }
   }
 }
-
-/* function updatePositionOfPlanet(planet: IPlanet, radius: number, center: number[]) {
-  const angle = planet.getAngle()
-  planet.setAngle(angle + Orbit)
-  const [x, y] = getPlanetPosition(radius, angleToRadian(angle), center)
-  planet.updatePosition(angle, x, y)
-} */
 
 export interface IOrbit {
   radius: number
@@ -101,14 +106,18 @@ export class Orbit implements IOrbit {
     this.planets.push(planet)
   }
 
-  public run(place, {
-    renderOrbit = false,
-    orbitColor = '#fff',
-    planetFilter = null,
-    requestGradient = null,
-  }
-    = {}) {
-    dynamicDistributeAngle(this.planets, this.radius, this._lastLength)
+  public run(
+    place,
+    {
+      renderOrbit = false,
+      orbitColor = '#fff',
+      planetFilter = null,
+      requestGradient = null,
+    } = {},
+  ) {
+    const { ifSomeNew, planets } = someNew(this.planets)
+    this.planets = planets
+    dynamicDistributeAngle(this.planets, this._targetRadius, this._lastLength, ifSomeNew)
     this._lastLength = this.planets.length
     if (this._needInit) {
       this.$group = place.append('g').attr('data-name', 'orbit-group')
@@ -150,8 +159,9 @@ export class Orbit implements IOrbit {
   public removePlanet(planetNeedRemove: IPlanet) {
     for (let i = 0; i < this.planets.length; i += 1) {
       if (planetNeedRemove === this.planets[i]) {
-        planetNeedRemove.remove()
-        this.planets.splice(i, 1)
+        planetNeedRemove.remove(() => {
+          // this.planets.splice(i, 1)
+        })
       }
     }
   }

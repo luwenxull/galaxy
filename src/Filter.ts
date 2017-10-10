@@ -1,5 +1,4 @@
-import { BaseType, Selection } from 'd3-selection'
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
+import { selectionGenerics } from './tool'
 export function gaussianBlur(
   filter: selectionGenerics,
   input: string = 'SourceGraphic',

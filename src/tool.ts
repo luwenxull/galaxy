@@ -1,3 +1,5 @@
+import { BaseType, Selection } from 'd3-selection'
+export type selectionGenerics = Selection<BaseType, any, BaseType, any>
 export function isNullOrUndefined(value): boolean {
   return typeof value === 'undefined' || value === null
 }

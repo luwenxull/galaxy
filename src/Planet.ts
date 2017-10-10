@@ -1,14 +1,15 @@
 import { BaseType, Selection } from 'd3-selection'
-import { isNullOrUndefined } from './tool'
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
+import { isNullOrUndefined, selectionGenerics } from './tool'
 
 export interface IPlanet {
+  needRemove: boolean
   create(
     parent: selectionGenerics,
     filter: string,
-    requestGradient: (baseColor: string, id: string) => string): void
+    requestGradient: (baseColor: string, id: string) => string
+  ): void
   updatePosition(radius: number, center: number[]): void
-  remove(): void
+  remove(callback: () => void): void
   getAngle(): number
   setAngle(angle: number): void
   getTargetAngle(): number
@@ -18,6 +19,7 @@ export interface IPlanet {
 }
 
 export class Planet implements IPlanet {
+  public needRemove: boolean
   protected $group: selectionGenerics
   protected angle: number
   protected _targetAngle: number
@@ -27,6 +29,7 @@ export class Planet implements IPlanet {
     if (new.target.name === 'Planet') {
       throw new Error('Do not call new Planet() directly!')
     }
+    this.needRemove = false
     this.$group = null
     this.angle = null
     this._targetAngle = null
@@ -41,10 +44,12 @@ export class Planet implements IPlanet {
 
   public updatePosition(r: number, center: number[]) {}
 
-  public remove() {
+  public remove(callback: () => void) {
+    this.needRemove = true
     if (!isNullOrUndefined(this.$group)) {
       this.$group.remove()
     }
+    callback()
   }
 
   public getAngle() {

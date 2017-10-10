@@ -1,4 +1,3 @@
-import { BaseType, Selection } from 'd3-selection'
 import {
   planetAngleAnimator,
   planetSizeAnimator,
@@ -8,9 +7,8 @@ import {
   angleToRadian,
   getPlanetPosition,
   isNullOrUndefined,
+  selectionGenerics,
 } from './tool'
-
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
 
 export interface IPlanetCircle extends IPlanet {
   getSize(): number
@@ -21,37 +19,43 @@ export interface IPlanetCircle extends IPlanet {
 
 export class PlanetCircle extends Planet implements IPlanetCircle {
   private color: string
+  private _targetColor: string
   private size: number
   private _targetSize: number
   private gradient?: string
+  private $circle: selectionGenerics
+  private requestGradient: (baseColor: string, id: string) => string
+  private _sizeAnimationEnd: boolean
+  private _sizeAnimationCallback: () => void
   constructor({ color = '#fff', size = 0, gradient = null} = {}) {
     super()
     this.color = color
     this.gradient = gradient
     this.size = 0
     this._targetSize = size
+    this._sizeAnimationEnd = true
+    this._sizeAnimationCallback = null
   }
 
   public create(
     parent: selectionGenerics,
     filter: string,
-    requestGradient: (baseColor: string, id: string) => string) {
+    requestGradient: (baseColor: string, id: string) => string,
+  ) {
+    this.requestGradient = requestGradient
     if (isNullOrUndefined(this.$group)) {
       this.$group = parent.append('g').attr('data-name', 'planet-group')
       if (filter) {
         this.$group.attr('filter', filter)
       }
-      planetSizeAnimator.execute(this, this.$group
+      this.$circle = this.$group
         .append('circle')
-        .attr('fill', () => {
-          return requestGradient ? requestGradient(this.color, this.gradient) : this.color
-        })
         .on('mousemove', () => {
           // this.stop()
         })
         .on('mouseleave', () => {
           // this.run()
-        }), 1000)
+        })
     }
   }
 
@@ -63,17 +67,22 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     } else if (this._angleAnimationEnd) {
       this.angle = this._targetAngle
     }
+    if (this.size !== this._targetSize && this._sizeAnimationEnd) {
+      this._sizeAnimationEnd = false
+      planetSizeAnimator.execute(this, this.$circle, 1000, () => {
+        this._sizeAnimationEnd = true
+        this._sizeAnimationCallback && this._sizeAnimationCallback()
+      })
+    }
     const [x, y] = getPlanetPosition(r, angleToRadian(this.angle), center)
     this.$group
       .select('circle')
       .attr('cx', x)
       .attr('cy', y)
       .attr('r', this.size)
-  }
-
-  public remove() {
-    this._targetSize = 0
-    planetSizeAnimator.execute(this, this.$group.select('circle'), 1000)
+      .attr('fill', () => {
+        return this.requestGradient ? this.requestGradient(this.color, this.gradient) : this.color
+      })
   }
 
   public getSize(): number {

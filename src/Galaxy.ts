@@ -1,13 +1,12 @@
 import Quadtree from 'best-candidate'
 import { randomUniform } from 'd3-random'
 import { select } from 'd3-selection'
-import { BaseType, Selection } from 'd3-selection'
 import { gaussianBlur, merge } from './Filter'
-import { stereoscopicStop } from './Gradient'
+import { requestGradient } from './Gradient'
 import { IOrbit } from './Orbit'
 import { IStar, Star} from './Star'
+import { selectionGenerics } from './tool'
 
-type selectionGenerics = Selection<BaseType, any, BaseType, any>
 interface IDefaultProp {
   container: selectionGenerics
   data: any
@@ -76,7 +75,6 @@ export class Galaxy implements IGalaxy {
     }, defaultProp)
     this.instanceOrbits = null
     this.$container = null
-    this.requestGradient = this.requestGradient.bind(this)
   }
 
   public render(container: HTMLElement, orbits: IOrbit[]) {
@@ -149,16 +147,6 @@ export class Galaxy implements IGalaxy {
     this.$orbits.rootGroup = this.$orbits.svg.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`)
   }
 
-  private requestGradient(baseColor: string, id: string): string {
-    if (gradientMap.has(id)) {
-      return 'url(#' + id + ')'
-    } else {
-      stereoscopicStop(this.$orbits.defs.append('radialGradient'), baseColor).attr('id', id)
-      gradientMap.set(id, true)
-      return 'url(#' + id + ')'
-    }
-  }
-
   private drawOrbits(orbits: IOrbit[]) {
     this.instanceOrbits = orbits
     for (const orbit of orbits) {
@@ -167,7 +155,7 @@ export class Galaxy implements IGalaxy {
         orbitColor: '#123456',
         planetFilter: 'url(#planet-gaussian-blur)',
         renderOrbit: true,
-        requestGradient: this.requestGradient,
+        requestGradient: requestGradient(this.$orbits.defs),
       })
     }
   }
