@@ -7,6 +7,7 @@
   "scripts": {
     "build": "npm run tsc && npm run eslint:fix",
     "tsc": "./node_modules/.bin/tsc",
+    "pack": "./node_modules/.bin/webpack --progress --profile --colors",
     "watch": "./node_modules/.bin/webpack --progress --profile --colors -w",
     "start": "./node_modules/.bin/webpack-dev-server --open",
     "tslint": "./node_modules/.bin/tslint ./src",
@@ -16,6 +17,7 @@
   },
   "dependencies": {
     "best-candidate": "^1.0.3",
+    "color-text": "^1.3.2",
     "d3": "^4.11.0"
   },
   "devDependencies": {

@@ -22,6 +22,11 @@ function generateOrbits() {
           color: colors[color],
           gradient: colors[color],
           size: sizeR(),
+        }, null, {
+          click: (p) => {
+            // tslint:disable-next-line:no-console
+            console.log(p)
+          },
         }),
       )
     }

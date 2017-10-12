@@ -6,6 +6,8 @@ export class Planet {
         } */
     this.$group = null;
     this.angle = null;
+    this.x = null;
+    this.y = null;
     this._targetAngle = null;
     this._angleAnimation = false;
     this._angleAnimationEnd = true;

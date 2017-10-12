@@ -1,3 +1,4 @@
+import { RectNode } from 'color-text'
 import {
   planetAngleAnimator,
   planetSizeAnimator,
@@ -6,8 +7,10 @@ import { Hinter, IHinter } from './Hinter'
 import { IPlanet, Planet } from './Planet'
 import {
   angleToRadian,
+  bindEvents,
   getPlanetPosition,
   isNullOrUndefined,
+  IStringIndexedFn,
   selectionGenerics,
 } from './tool'
 
@@ -30,9 +33,11 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   private requestGradient: (baseColor: string, id: string) => string
   private _sizeAnimationEnd: boolean
   private _sizeAnimationCallback: () => void
-  private hinter: IHinter
-  constructor({ color = '#fff', size = 0, gradient = null} = {}) {
-    super()
+  private hinter: RectNode
+  constructor(
+    { color = '#fff', size = 0, gradient = null} = {}, externalData: any = null, events: IStringIndexedFn = null,
+  ) {
+    super(externalData, events)
     this.color = color
     this.gradient = gradient
     this.size = 0
@@ -62,13 +67,8 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
       }
       this.$circle = this.$group
         .append('circle')
-        .on('mousemove', () => {
-          // this.stop()
-        })
-        .on('mouseleave', () => {
-          // this.run()
-        })
-      this.hinter = new Hinter(this.$group.append('g').attr('data-name', 'planet-cap'))
+      bindEvents(this.$circle, this._events, [this])
+      this.hinter = new RectNode()
     }
   }
 
@@ -117,7 +117,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   }
 
   public putOnCap(): void {
-    this.hinter.show('good', [this.x, this.y])
+    // this.hinter.show('good', [this.x, this.y])
   }
 
   public takeOffCap(): void {

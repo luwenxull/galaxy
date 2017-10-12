@@ -104,6 +104,7 @@ export class Galaxy implements IGalaxy {
       style: {
         height: '100%',
         overflow: 'hidden',
+        position: 'relative',
         width: '100%',
       },
     }, defaultProp)

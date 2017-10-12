@@ -1,4 +1,5 @@
 import { planetAngleAnimator, planetSizeAnimator } from './Animator';
+import { Hinter } from './Hinter';
 import { Planet } from './Planet';
 import { angleToRadian, getPlanetPosition, isNullOrUndefined } from './tool';
 export class PlanetCircle extends Planet {
@@ -10,6 +11,7 @@ export class PlanetCircle extends Planet {
     this._targetSize = size;
     this._sizeAnimationEnd = true;
     this._sizeAnimationCallback = null;
+    this.hinter = null;
   }
   propertyToBeClone() {
     return Object.assign({
@@ -32,6 +34,7 @@ export class PlanetCircle extends Planet {
         .on('mouseleave', () => {
           // this.run()
         });
+      this.hinter = new Hinter(this.$group.append('g').attr('data-name', 'planet-cap'));
     }
   }
   updatePosition(r, center) {
@@ -50,6 +53,8 @@ export class PlanetCircle extends Planet {
       });
     }
     const [x, y] = getPlanetPosition(r, angleToRadian(this.angle), center);
+    this.x = x;
+    this.y = y;
     this.$group
       .select('circle')
       .attr('cx', x)
@@ -70,5 +75,11 @@ export class PlanetCircle extends Planet {
   }
   setTargetSize(size) {
     this._targetSize = size;
+  }
+  putOnCap() {
+    this.hinter.show('good', [this.x, this.y]);
+  }
+  takeOffCap() {
+    this.hinter.close();
   }
 }

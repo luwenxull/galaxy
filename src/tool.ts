@@ -1,5 +1,12 @@
 import { BaseType, Selection } from 'd3-selection'
 export type selectionGenerics = Selection<BaseType, any, BaseType, any>
+export interface IStringIndexed {
+  [prop: string]: any
+}
+export interface IStringIndexedFn {
+  [prop: string]: (...arg) => any
+}
+
 export function isNullOrUndefined(value): boolean {
   return typeof value === 'undefined' || value === null
 }
@@ -28,4 +35,24 @@ export function isArray<T>(val: T): boolean {
 
 export function toArray(val: any): any[] {
   return [].concat(val)
+}
+
+export function iterateObj<T extends IStringIndexed>(
+  obj: T, callback: (val: any, key: keyof T) => void,
+): IStringIndexed {
+  const keys = Object.keys(obj)
+  for (const key of keys) {
+    callback(obj[key], key)
+  }
+  return obj
+}
+
+export function bindEvents(
+  selection: selectionGenerics, events: IStringIndexedFn, externalArgs: any[],
+): void {
+  iterateObj(events, (callback, key) => {
+    selection.on(key, () => {
+      callback(...externalArgs)
+    })
+  })
 }

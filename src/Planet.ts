@@ -1,5 +1,5 @@
 import { BaseType, Selection } from 'd3-selection'
-import { isNullOrUndefined, selectionGenerics } from './tool'
+import { isNullOrUndefined, IStringIndexedFn, selectionGenerics } from './tool'
 
 export interface IPlanet {
   propertyToBeClone(): object
@@ -16,6 +16,7 @@ export interface IPlanet {
   setTargetAngle(angle: number): void
   requesetAngleAnimation(): void
   cancelAngleAnimation(): void
+  getExternalData(): any
 }
 
 export class Planet implements IPlanet {
@@ -27,7 +28,9 @@ export class Planet implements IPlanet {
   protected _targetAngle: number
   protected _angleAnimation: boolean
   protected _angleAnimationEnd: boolean
-  constructor() {
+  protected _externalData: any
+  protected _events: IStringIndexedFn
+  constructor(data: any = null, events: IStringIndexedFn = null) {
     /* if (new.target.name === 'Planet') {
       throw new Error('Do not call new Planet() directly!')
     } */
@@ -38,6 +41,8 @@ export class Planet implements IPlanet {
     this._targetAngle = null
     this._angleAnimation = false
     this._angleAnimationEnd = true
+    this._externalData = data
+    this._events = events
   }
 
   public propertyToBeClone() {
@@ -83,5 +88,9 @@ export class Planet implements IPlanet {
 
   public cancelAngleAnimation() {
     this._angleAnimationEnd = true
+  }
+
+  public getExternalData(): any {
+    return this._externalData
   }
 }

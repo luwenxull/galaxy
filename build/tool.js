@@ -15,3 +15,9 @@ export function getPlanetPosition(radius, radian, center) {
   const y = radius * Math.sin(radian);
   return [center[0] + x, center[1] + y];
 }
+export function isArray(val) {
+  return val instanceof Array;
+}
+export function toArray(val) {
+  return [].concat(val);
+}
