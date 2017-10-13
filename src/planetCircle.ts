@@ -1,16 +1,16 @@
-import { RectNode } from 'color-text'
+import { INode, RectNode } from 'color-text'
+import { BaseType, Selection } from 'd3-selection'
 import {
   planetAngleAnimator,
   planetSizeAnimator,
-} from './Animator'
-import { Hinter, IHinter } from './Hinter'
-import { IPlanet, Planet } from './Planet'
+} from './animator'
+import { IOrbit } from './orbit'
+import { IPlanet, IPlanetCallback, Planet } from './planet'
 import {
   angleToRadian,
   bindEvents,
   getPlanetPosition,
   isNullOrUndefined,
-  IStringIndexedFn,
   selectionGenerics,
 } from './tool'
 
@@ -33,9 +33,9 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   private requestGradient: (baseColor: string, id: string) => string
   private _sizeAnimationEnd: boolean
   private _sizeAnimationCallback: () => void
-  private hinter: RectNode
+  private hinter: INode
   constructor(
-    { color = '#fff', size = 0, gradient = null} = {}, externalData: any = null, events: IStringIndexedFn = null,
+    { color = '#fff', size = 0, gradient = null } = {}, externalData: any = {}, events: IPlanetCallback = {},
   ) {
     super(externalData, events)
     this.color = color
@@ -50,6 +50,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
   public propertyToBeClone() {
     return Object.assign({
       $circle: this.$circle,
+      hinter: this.hinter,
       size: this.size,
     }, super.propertyToBeClone())
   }
@@ -58,6 +59,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
     parent: selectionGenerics,
     filter: string,
     requestGradient: (baseColor: string, id: string) => string,
+    orbit: IOrbit,
   ) {
     this.requestGradient = requestGradient
     if (isNullOrUndefined(this.$group)) {
@@ -67,7 +69,7 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
       }
       this.$circle = this.$group
         .append('circle')
-      bindEvents(this.$circle, this._events, [this])
+      bindEvents(this.$circle, this._events, [this, orbit])
       this.hinter = new RectNode()
     }
   }
@@ -98,6 +100,26 @@ export class PlanetCircle extends Planet implements IPlanetCircle {
       .attr('fill', () => {
         return this.requestGradient ? this.requestGradient(this.color, this.gradient) : this.color
       })
+    if (this.hinter) {
+      this.hinter.show(this.$group.node() as SVGElement, {
+        corner: [x, y],
+        text: this._externalData,
+      }, {
+          bg: {
+            fill: '#eee',
+            rx: 5,
+            ry: 5,
+          },
+        })
+      // console.log(receNode)
+      const rect: ClientRect = this.hinter.getPaintRect()
+      this.hinter.move(0, -rect.height)
+    }
+  }
+
+  public remove() {
+    this.hinter && this.hinter.close()
+    super.remove()
   }
 
   public getSize(): number {

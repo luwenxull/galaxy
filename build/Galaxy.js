@@ -1,9 +1,9 @@
 import Quadtree from 'best-candidate';
 import { randomUniform } from 'd3-random';
 import { select } from 'd3-selection';
-import { gaussianBlur, merge } from './Filter';
-import { requestGradient } from './Gradient';
-import { Star } from './Star';
+import { gaussianBlur, merge } from './filter';
+import { requestGradient } from './gradient';
+import { Star } from './star';
 import { isNullOrUndefined } from './tool';
 const randomStep = randomUniform(0.01, 0.02);
 const defaultProp = {
@@ -46,14 +46,13 @@ function takeFromCacheOrbits(newOrbits, cacheOrbits) {
   for (let i = 0; i < nl; i++) {
     if (!isNullOrUndefined(cacheOrbits[i])) {
       Object.assign(newOrbits[i], cacheOrbits[i].propertyToBeClone());
-      cacheOrbits[i].reset();
+      cacheOrbits[i].remove();
       takeFromCachePlanets(newOrbits[i].planets, cacheOrbits[i].planets);
     }
   }
   if (nl < cl) {
     for (let j = nl; j < cl; j++) {
-      cacheOrbits[j].remove();
-      cacheOrbits[j].reset();
+      cacheOrbits[j].remove(true);
     }
   }
 }
@@ -73,6 +72,7 @@ export class Galaxy {
       style: {
         height: '100%',
         overflow: 'hidden',
+        position: 'relative',
         width: '100%',
       },
     }, defaultProp);

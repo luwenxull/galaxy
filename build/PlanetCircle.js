@@ -1,10 +1,10 @@
-import { planetAngleAnimator, planetSizeAnimator } from './Animator';
-import { Hinter } from './Hinter';
-import { Planet } from './Planet';
-import { angleToRadian, getPlanetPosition, isNullOrUndefined } from './tool';
+import { RectNode } from 'color-text';
+import { planetAngleAnimator, planetSizeAnimator } from './animator';
+import { Planet } from './planet';
+import { angleToRadian, bindEvents, getPlanetPosition, isNullOrUndefined } from './tool';
 export class PlanetCircle extends Planet {
-  constructor({ color = '#fff', size = 0, gradient = null } = {}) {
-    super();
+  constructor({ color = '#fff', size = 0, gradient = null } = {}, externalData = {}, events = {}) {
+    super(externalData, events);
     this.color = color;
     this.gradient = gradient;
     this.size = 0;
@@ -16,10 +16,11 @@ export class PlanetCircle extends Planet {
   propertyToBeClone() {
     return Object.assign({
       $circle: this.$circle,
+      hinter: this.hinter,
       size: this.size,
     }, super.propertyToBeClone());
   }
-  create(parent, filter, requestGradient) {
+  create(parent, filter, requestGradient, orbit) {
     this.requestGradient = requestGradient;
     if (isNullOrUndefined(this.$group)) {
       this.$group = parent.append('g').attr('data-name', 'planet-group');
@@ -27,14 +28,9 @@ export class PlanetCircle extends Planet {
         this.$group.attr('filter', filter);
       }
       this.$circle = this.$group
-        .append('circle')
-        .on('mousemove', () => {
-          // this.stop()
-        })
-        .on('mouseleave', () => {
-          // this.run()
-        });
-      this.hinter = new Hinter(this.$group.append('g').attr('data-name', 'planet-cap'));
+        .append('circle');
+      bindEvents(this.$circle, this._events, [this, orbit]);
+      this.hinter = new RectNode();
     }
   }
   updatePosition(r, center) {
@@ -63,6 +59,25 @@ export class PlanetCircle extends Planet {
       .attr('fill', () => {
         return this.requestGradient ? this.requestGradient(this.color, this.gradient) : this.color;
       });
+    if (this.hinter) {
+      this.hinter.show(this.$group.node(), {
+        corner: [x, y],
+        text: this._externalData,
+      }, {
+        bg: {
+          fill: '#eee',
+          rx: 5,
+          ry: 5,
+        },
+      });
+      // console.log(receNode)
+      const rect = this.hinter.getPaintRect();
+      this.hinter.move(0, -rect.height);
+    }
+  }
+  remove() {
+    this.hinter && this.hinter.close();
+    super.remove();
   }
   getSize() {
     return this.size;
@@ -77,7 +92,7 @@ export class PlanetCircle extends Planet {
     this._targetSize = size;
   }
   putOnCap() {
-    this.hinter.show('good', [this.x, this.y]);
+    // this.hinter.show('good', [this.x, this.y])
   }
   takeOffCap() {
     this.hinter.close();

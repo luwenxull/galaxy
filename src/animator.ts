@@ -1,6 +1,7 @@
-import { transition } from 'd3-transition' // eslint-disable-line no-unused-vars
-import { IOrbit } from './Orbit'
-import { IPlanetCircle } from './PlanetCircle'
+import { BaseType, Selection } from 'd3-selection'
+import { transition } from 'd3-transition'
+import { IOrbit } from './orbit'
+import { IPlanetCircle } from './planetCircle'
 import { selectionGenerics } from './tool'
 transition(null)
 

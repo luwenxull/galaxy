@@ -1,6 +1,7 @@
 import { color } from 'd3-color'
+import { BaseType, Selection } from 'd3-selection'
 import { selectionGenerics } from './tool'
-interface IStop {
+export interface IStop {
   offset: string
   color: string
 }

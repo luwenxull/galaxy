@@ -1,4 +1,4 @@
-import { transition } from 'd3-transition'; // eslint-disable-line no-unused-vars
+import { transition } from 'd3-transition';
 transition(null);
 export const planetSizeAnimator = {
   execute(planet, node, time, endCallback) {

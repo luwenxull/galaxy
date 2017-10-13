@@ -1,10 +1,9 @@
 import { BaseType, Selection } from 'd3-selection'
+import { IPlanetCallback } from './planet'
+
 export type selectionGenerics = Selection<BaseType, any, BaseType, any>
 export interface IStringIndexed {
   [prop: string]: any
-}
-export interface IStringIndexedFn {
-  [prop: string]: (...arg) => any
 }
 
 export function isNullOrUndefined(value): boolean {
@@ -37,22 +36,22 @@ export function toArray(val: any): any[] {
   return [].concat(val)
 }
 
-export function iterateObj<T extends IStringIndexed>(
-  obj: T, callback: (val: any, key: keyof T) => void,
+export function iterateObj<T extends IStringIndexed, K extends keyof T>(
+  obj: T, callback: (val: T[K], key: K) => void,
 ): IStringIndexed {
-  const keys = Object.keys(obj)
+  const keys = Object.keys(obj) as K[]
   for (const key of keys) {
     callback(obj[key], key)
   }
   return obj
 }
 
-export function bindEvents(
-  selection: selectionGenerics, events: IStringIndexedFn, externalArgs: any[],
+export function bindEvents<T extends IPlanetCallback>(
+  selection: selectionGenerics, events: T, externalArgs: any[], type: string = 'USER-DEFINE',
 ): void {
-  iterateObj(events, (callback, key) => {
-    selection.on(key, () => {
-      callback(...externalArgs)
+  iterateObj(events, (cb, key) => {
+    selection.on(key + '.' + type, () => {
+      cb(...externalArgs)
     })
   })
 }

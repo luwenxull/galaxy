@@ -1,7 +1,8 @@
 import { randomUniform } from 'd3-random'
-import { orbitAnimator } from './Animator'
-import { IPlanet } from './Planet'
-import { IPlanetCircle, PlanetCircle } from './PlanetCircle'
+import { BaseType, Selection } from 'd3-selection'
+import { orbitAnimator } from './animator'
+import { IPlanet } from './planet'
+import { IPlanetCircle, PlanetCircle } from './planetCircle'
 import {
   getAngle,
   getPlanetPosition,
@@ -50,11 +51,12 @@ export interface IOrbit {
   speed: number
   angle: number
   planets: IPlanet[]
+  pause(): void
+  resume(): void
   propertyToBeClone(): object
   addPlanet(planet: IPlanet): void
   run(place: selectionGenerics, config?: object): void
-  remove(): void
-  reset(): void
+  remove(removeGroup?: boolean): void
   getRadius(): number
   setRadius(radius: number): void
   getTargetRadius(): number
@@ -73,6 +75,7 @@ export class Orbit implements IOrbit {
   private _needInit: boolean
   private _targetRadius: number
   private _lastLength: number
+  private _paused: boolean
   constructor(speed: number, center = [0, 0]) {
     this.radius = null
     this.center = center
@@ -85,6 +88,15 @@ export class Orbit implements IOrbit {
     this._needInit = true
     this._targetRadius = null
     this._lastLength = null
+    this._paused = false
+  }
+
+  public pause() {
+    this._paused = true
+  }
+
+  public resume() {
+    this._paused = false
   }
 
   public propertyToBeClone() {
@@ -120,12 +132,14 @@ export class Orbit implements IOrbit {
     }
     this.drawOrbit(renderOrbit, orbitColor)
     for (const planet of this.planets) {
-      planet.create(this.$group, planetFilter, requestGradient)
+      planet.create(this.$group, planetFilter, requestGradient, this)
     }
     const run = () => {
-      for (const planet of this.planets) {
-        planet.setTargetAngle(this.speed + planet.getTargetAngle())
-        planet.updatePosition(this.radius, this.center)
+      if (!this._paused) {
+        for (const planet of this.planets) {
+          planet.setTargetAngle(this.speed + planet.getTargetAngle())
+          planet.updatePosition(this.radius, this.center)
+        }
       }
       this.animationFrame = requestAnimationFrame(run)
     }
@@ -133,18 +147,17 @@ export class Orbit implements IOrbit {
     this.animationFrame = requestAnimationFrame(run)
   }
 
-  public reset() {
-    this.$group = null
-    !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame)
-  }
-
-  public remove() {
-    if (!isNullOrUndefined(this.$group)) {
-      this.$group.remove()
-    }
+  public remove(hard: boolean = false) {
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame)
     }
+    if (hard) {
+      this.$group.remove()
+      for (const planet of this.planets) {
+        planet.remove()
+      }
+    }
+    this.$group = null
   }
 
   public setRadius(radius: number): void {

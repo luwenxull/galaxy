@@ -1,11 +1,11 @@
 import Quadtree from 'best-candidate'
 import { randomUniform } from 'd3-random'
 import { select } from 'd3-selection'
-import { gaussianBlur, merge } from './Filter'
-import { requestGradient } from './Gradient'
-import { IOrbit } from './Orbit'
-import { IPlanet } from './Planet'
-import { IStar, Star } from './Star'
+import { gaussianBlur, merge } from './filter'
+import { requestGradient } from './gradient'
+import { IOrbit } from './orbit'
+import { IPlanet } from './planet'
+import { IStar, Star } from './star'
 import { isNullOrUndefined, selectionGenerics } from './tool'
 
 interface IDefaultProp {
@@ -60,14 +60,13 @@ function takeFromCacheOrbits(newOrbits: IOrbit[], cacheOrbits: IOrbit[]) {
   for (let i = 0; i < nl; i++) {
     if (!isNullOrUndefined(cacheOrbits[i])) {
       Object.assign(newOrbits[i], cacheOrbits[i].propertyToBeClone())
-      cacheOrbits[i].reset()
+      cacheOrbits[i].remove()
       takeFromCachePlanets(newOrbits[i].planets, cacheOrbits[i].planets)
     }
   }
   if (nl < cl) {
     for (let j = nl; j < cl; j++) {
-      cacheOrbits[j].remove()
-      cacheOrbits[j].reset()
+      cacheOrbits[j].remove(true)
     }
   }
 }

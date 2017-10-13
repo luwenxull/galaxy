@@ -1,5 +1,5 @@
 import { randomUniform } from 'd3-random';
-import { orbitAnimator } from './Animator';
+import { orbitAnimator } from './animator';
 import { getAngle, isNullOrUndefined } from './tool';
 function someNew(planets) {
   for (let i = 0; i < planets.length; i++) {
@@ -45,6 +45,13 @@ export class Orbit {
     this._needInit = true;
     this._targetRadius = null;
     this._lastLength = null;
+    this._paused = false;
+  }
+  pause() {
+    this._paused = true;
+  }
+  resume() {
+    this._paused = false;
   }
   propertyToBeClone() {
     return {
@@ -69,29 +76,31 @@ export class Orbit {
     }
     this.drawOrbit(renderOrbit, orbitColor);
     for (const planet of this.planets) {
-      planet.create(this.$group, planetFilter, requestGradient);
+      planet.create(this.$group, planetFilter, requestGradient, this);
     }
     const run = () => {
-      for (const planet of this.planets) {
-        planet.setTargetAngle(this.speed + planet.getTargetAngle());
-        planet.updatePosition(this.radius, this.center);
+      if (!this._paused) {
+        for (const planet of this.planets) {
+          planet.setTargetAngle(this.speed + planet.getTargetAngle());
+          planet.updatePosition(this.radius, this.center);
+        }
       }
       this.animationFrame = requestAnimationFrame(run);
     };
     !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame);
     this.animationFrame = requestAnimationFrame(run);
   }
-  reset() {
-    this.$group = null;
-    !isNullOrUndefined(this.animationFrame) && cancelAnimationFrame(this.animationFrame);
-  }
-  remove() {
-    if (!isNullOrUndefined(this.$group)) {
-      this.$group.remove();
-    }
+  remove(hard = false) {
     if (!isNullOrUndefined(this.animationFrame)) {
       cancelAnimationFrame(this.animationFrame);
     }
+    if (hard) {
+      this.$group.remove();
+      for (const planet of this.planets) {
+        planet.remove();
+      }
+    }
+    this.$group = null;
   }
   setRadius(radius) {
     this.radius = radius;

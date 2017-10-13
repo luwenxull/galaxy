@@ -1,5 +1,10 @@
 import { BaseType, Selection } from 'd3-selection'
-import { isNullOrUndefined, IStringIndexedFn, selectionGenerics } from './tool'
+import { IOrbit } from './orbit'
+import { isNullOrUndefined, selectionGenerics } from './tool'
+
+export interface IPlanetCallback {
+  [prop: string]: (planet?: IPlanet, orbit?: IOrbit) => any
+}
 
 export interface IPlanet {
   propertyToBeClone(): object
@@ -7,6 +12,7 @@ export interface IPlanet {
     parent: selectionGenerics,
     filter: string,
     requestGradient: (baseColor: string, id: string) => string,
+    orbit: IOrbit,
   ): void
   updatePosition(radius: number, center: number[]): void
   remove(): void
@@ -29,8 +35,8 @@ export class Planet implements IPlanet {
   protected _angleAnimation: boolean
   protected _angleAnimationEnd: boolean
   protected _externalData: any
-  protected _events: IStringIndexedFn
-  constructor(data: any = null, events: IStringIndexedFn = null) {
+  protected _events: IPlanetCallback
+  constructor(data: any = {}, events: IPlanetCallback = {}) {
     /* if (new.target.name === 'Planet') {
       throw new Error('Do not call new Planet() directly!')
     } */
@@ -56,7 +62,9 @@ export class Planet implements IPlanet {
   public create(
     parent: selectionGenerics,
     filter: string,
-    requestGradient: (baseColor: string, id: string) => string) {}
+    requestGradient: (baseColor: string, id: string) => string,
+    orbit: IOrbit,
+  ) {}
 
   public updatePosition(r: number, center: number[]) {}
 

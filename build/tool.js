@@ -21,3 +21,17 @@ export function isArray(val) {
 export function toArray(val) {
   return [].concat(val);
 }
+export function iterateObj(obj, callback) {
+  const keys = Object.keys(obj);
+  for (const key of keys) {
+    callback(obj[key], key);
+  }
+  return obj;
+}
+export function bindEvents(selection, events, externalArgs, type = 'USER-DEFINE') {
+  iterateObj(events, (cb, key) => {
+    selection.on(key + '.' + type, () => {
+      cb(...externalArgs);
+    });
+  });
+}

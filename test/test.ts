@@ -1,7 +1,7 @@
 import { randomUniform } from 'd3-random'
-import { Galaxy, IGalaxy} from '../src/Galaxy'
-import { IOrbit, Orbit } from '../src/Orbit'
-import { IPlanetCircle, PlanetCircle } from '../src/PlanetCircle'
+import { Galaxy, IGalaxy} from '../src/galaxy'
+import { IOrbit, Orbit } from '../src/orbit'
+import { IPlanetCircle, PlanetCircle } from '../src/planetCircle'
 // let radiusR = randomUniform(-10, 10)
 const galaxy: IGalaxy = new Galaxy()
 const sizeR = randomUniform(10, 20)
@@ -22,10 +22,12 @@ function generateOrbits() {
           color: colors[color],
           gradient: colors[color],
           size: sizeR(),
-        }, null, {
-          click: (p) => {
-            // tslint:disable-next-line:no-console
-            console.log(p)
+        }, 'hello', {
+          mouseleave(p, o) {
+            o.resume()
+          },
+          mousemove(p, o) {
+            o.pause()
           },
         }),
       )

@@ -1,6 +1,6 @@
 import { isNullOrUndefined } from './tool';
 export class Planet {
-  constructor() {
+  constructor(data = {}, events = {}) {
     /* if (new.target.name === 'Planet') {
           throw new Error('Do not call new Planet() directly!')
         } */
@@ -11,6 +11,8 @@ export class Planet {
     this._targetAngle = null;
     this._angleAnimation = false;
     this._angleAnimationEnd = true;
+    this._externalData = data;
+    this._events = events;
   }
   propertyToBeClone() {
     return {
@@ -19,7 +21,7 @@ export class Planet {
       angle: this.angle,
     };
   }
-  create(parent, filter, requestGradient) { }
+  create(parent, filter, requestGradient, orbit) { }
   updatePosition(r, center) { }
   remove() {
     if (!isNullOrUndefined(this.$group)) {
@@ -43,5 +45,8 @@ export class Planet {
   }
   cancelAngleAnimation() {
     this._angleAnimationEnd = true;
+  }
+  getExternalData() {
+    return this._externalData;
   }
 }
